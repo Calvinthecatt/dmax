@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dmax</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dmax">
+<meta name="theme-color" content="#0d0c0b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="color-scheme" content="dark">
+<style>
+:root{
+  --bg:#0d0c0b;--panel:#181614;--panel2:#221f1c;--line:#34302b;--text:#f1ebe1;--muted:#a09789;
+  --accent:#f0a030;--onacc:#1b1205;--pribg:#f0a030;--warn:#ff7a66;--ok:#9ad08a;--phbg:#221f1c;--bar:#f0a030;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+body.safe{--bg:#000;--panel:#000;--panel2:#000;--line:#3a0000;--text:#a40000;--muted:#6a0000;--accent:#c20000;--onacc:#c20000;--pribg:transparent;--warn:#c20000;--ok:#a40000;--phbg:#8a0000;--bar:transparent}
+body.safe.dim1{--line:#280000;--text:#6c0000;--muted:#470000;--accent:#860000;--onacc:#860000;--warn:#860000;--ok:#6c0000;--phbg:#560000}
+body.safe.dim3{--line:#4a0000;--text:#cf0000;--muted:#8a0000;--accent:#f00000;--onacc:#f00000;--warn:#f00000;--ok:#cf0000;--phbg:#b00000}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.4 var(--sans);-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0;letter-spacing:.01em}
+h2{font-size:26px;line-height:1.15}
+h3{font-size:19px}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+#top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand b{font-family:var(--serif);font-size:26px;font-style:italic;letter-spacing:.02em;color:var(--accent)}
+.brand span{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.14em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{max-width:760px;margin:0 auto;padding:16px 14px calc(env(safe-area-inset-bottom) + 120px)}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+#nav button{flex:1;min-height:66px;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;position:relative}
+#nav button.on{color:var(--accent)}
+#nav button.on::before{content:"";position:absolute;top:-1px;left:22%;right:22%;height:2px;background:var(--accent)}
+#nav svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#navBadge{position:absolute;top:6px;right:8%;font-family:var(--mono);font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:9px;padding:0 5px;background:var(--bg)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:10px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-weight:600;cursor:pointer;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--pribg);color:var(--onacc);border-color:var(--accent)}
+body.safe .btn.pri{border-width:2px}
+.btn.ghost{background:transparent}
+.btn.big{min-height:84px;font-size:24px;border-radius:20px;width:100%;letter-spacing:.04em}
+.btn.wide{width:100%}
+.btn.sm{min-height:46px;padding:6px 14px;font-size:15px;border-radius:12px}
+.btn.danger{color:var(--warn);border-color:var(--warn);background:transparent}
+.btn[disabled]{opacity:.4}
+.row{display:flex;gap:10px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.row>.grow{flex:1;min-width:0}
+.stack>*+*{margin-top:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card+.card,.card+.btn,.btn+.card{margin-top:12px}
+.sec{margin-top:26px}
+.sec>h3{margin-bottom:10px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.f{display:block;min-width:0}
+.f>span{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+input,select,textarea{width:100%;min-height:54px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:18px;outline:none;caret-color:var(--accent);-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7}
+textarea{min-height:96px;resize:vertical;line-height:1.35}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:34px}
+input[type=file]{display:none}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.span2{grid-column:span 2}
+.scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:46px;padding:8px 16px;border-radius:23px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--pribg);color:var(--onacc);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.seg{display:flex;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.seg button{flex:1;min-height:52px;border:0;background:transparent;color:var(--muted);font-weight:600;cursor:pointer;padding:6px 4px;font-size:15px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--pribg);color:var(--onacc);box-shadow:inset 0 0 0 2px var(--accent)}
+.tabs{margin:0 -14px 16px;padding:0 14px 6px}
+.pill{display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;border-radius:20px;padding:2px 9px;white-space:nowrap}
+.st-test{color:var(--muted)}.st-work{color:#7fb6d6}.st-final{color:var(--ok)}.st-edition{color:var(--accent)}.st-exhibited{color:#c9a0e8}.st-sold{color:#ff8fa0}
+body.safe .pill{color:var(--text)}
+.stars{color:var(--accent);letter-spacing:2px;font-size:15px;white-space:nowrap}
+.pc{display:flex;gap:14px;width:100%;text-align:left;cursor:pointer;color:var(--text);padding:12px;align-items:stretch}
+.pc+.pc{margin-top:10px}
+.ph{display:block;background:var(--phbg);border-radius:10px;overflow:hidden;isolation:isolate;flex:none}
+.ph img{display:block;width:100%;height:100%;object-fit:cover}
+body.safe .ph img{mix-blend-mode:multiply;filter:grayscale(1) brightness(.6) contrast(1.1)}
+.th{width:84px;height:84px}
+.noph{width:84px;height:84px;border-radius:10px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:26px;color:var(--muted);flex:none}
+.pc-b{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.pc-t{font-family:var(--serif);font-size:20px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc-m{font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc-f{display:flex;gap:8px;align-items:center;margin-top:auto;flex-wrap:wrap}
+.fab{position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom) + 82px);z-index:15;min-height:62px;padding:0 26px;border-radius:31px;font-size:18px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+body.safe .fab{background:#000;box-shadow:none}
+.big{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;line-height:1;letter-spacing:-.02em}
+.out{border:1px solid var(--accent);border-radius:18px;padding:16px;margin-top:14px}
+.out .big{font-size:56px;color:var(--accent)}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-top:1px solid var(--line);font-size:16px}
+.kv:first-child{border-top:0}
+.kv span{color:var(--muted)}
+.kv b{font-weight:600;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kv b.txt{font-family:var(--sans);font-weight:500;white-space:pre-wrap}
+.warn{border:1px dashed var(--warn);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:15px;margin-top:10px}
+.note{font-size:14px;color:var(--muted);margin-top:10px}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:16px}
+th{font:600 11px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:right;padding:6px 6px}
+td{text-align:right;padding:10px 6px;border-top:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+tr.hl td{color:var(--accent);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:10px 8px;text-align:center;min-width:0}
+.tile i{display:block;font-style:normal;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tile b{display:block;font-family:var(--mono);font-size:26px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gal{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.gal .gi{flex:none;background:none;border:0;padding:0;cursor:pointer;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-align:left}
+.gal .ph{width:132px;height:132px;margin-bottom:4px}
+.gread{text-align:center;padding:18px 8px 14px}
+.gread .gname{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--muted)}
+.gread .ym{display:flex;justify-content:center;gap:22px;margin-top:6px}
+.gread .ym div{min-width:0}
+.gread .ym i{display:block;font-style:normal;font-size:14px;letter-spacing:.2em;color:var(--muted)}
+.gread .ym b{font-family:var(--mono);font-weight:700;font-size:clamp(72px,26vw,150px);line-height:.95;color:var(--accent);letter-spacing:-.04em}
+.gbtn{min-height:60px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--text);font-family:var(--mono);font-size:22px;font-weight:600;cursor:pointer}
+.gbtn.on{background:var(--pribg);color:var(--onacc);border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.tbig{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;font-size:clamp(84px,30vw,170px);line-height:1;text-align:center;color:var(--accent);letter-spacing:-.04em;padding:8px 0}
+.tstate{text-align:center;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);min-height:20px}
+.steps .stp{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:50px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;font-size:16px}
+.steps .stp+.stp{margin-top:6px}
+.steps .stp.on{color:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.steps .stp.done{opacity:.5;text-decoration:line-through}
+.menu .btn{justify-content:space-between;width:100%;min-height:68px;font-size:19px;font-family:var(--serif);font-weight:600}
+.menu .btn+.btn{margin-top:10px}
+.menu .btn small{font:400 13px var(--sans);color:var(--muted)}
+.bar{height:12px;border-radius:6px;background:var(--bar);border:1px solid var(--accent);min-width:3px}
+.barrow{display:grid;grid-template-columns:110px 1fr 40px;gap:10px;align-items:center;padding:6px 0;font-size:15px}
+.barrow b{font-family:var(--mono);text-align:right}
+.months{display:flex;align-items:flex-end;gap:4px;height:90px}
+.months div{flex:1;border:1px solid var(--accent);background:var(--bar);border-radius:3px 3px 0 0;min-height:2px}
+.mlab{display:flex;gap:4px;font-size:10px;color:var(--muted);text-align:center;margin-top:4px}
+.mlab span{flex:1}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 70px);transform:translateX(-50%);z-index:60;background:var(--bg);border:1px solid var(--accent);color:var(--text);padding:12px 18px;border-radius:14px;font-size:16px;max-width:86vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+#lb{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
+#lb[hidden]{display:none}
+#lb .ph{display:inline-block;max-width:100%;border-radius:4px}
+#lb .ph img{width:auto;height:auto;max-width:100%;max-height:68vh;object-fit:contain}
+.xbtn{width:46px;min-width:46px;padding:0}
+.hr{height:1px;background:var(--line);margin:16px 0}
+.back{background:none;border:0;color:var(--muted);min-height:46px;padding:0 6px 0 0;font-size:15px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.rate button{background:none;border:0;font-size:34px;color:var(--muted);min-width:50px;min-height:54px;cursor:pointer;padding:0}
+.rate button.on{color:var(--accent)}
+.apg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.apg div{border:1px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center;font-family:var(--mono);font-size:15px}
+.apg div.full{border-color:var(--muted)}
+.apg div.cur{border-color:var(--accent);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.apg i{display:block;font-style:normal;font-size:12px;color:var(--muted)}
+@media(min-width:620px){.tiles{grid-template-columns:repeat(6,1fr)}.apg{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+<header id="top">
+  <div class="brand"><b>Dmax</b><span id="crumb">Print log</span></div>
+  <button id="safeBtn" class="btn sm ghost" data-a="safe" aria-pressed="false">Safelight</button>
+</header>
+<main id="view"></main>
+<nav id="nav">
+  <button data-a="nav" data-v="log"><svg viewBox="0 0 24 24"><path d="M6 3.5h12v17H6zM9.5 8h5M9.5 12h5M9.5 16h3"/></svg>Log</button>
+  <button data-a="nav" data-v="tools"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5l3 6M20.2 10l-6.6 1M17.5 18.5l-4-5.3M6.5 18.5l2.6-6M3.8 10l6.2 2.6"/></svg>Tools</button>
+  <button data-a="nav" data-v="timer"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9M9.5 3h5M18 7l1.5-1.5"/></svg>Timer<span id="navBadge" hidden></span></button>
+  <button data-a="nav" data-v="grades"><svg viewBox="0 0 24 24"><path d="M3.5 6h17M6.5 12h11M9.5 18h5"/></svg>Grades</button>
+  <button data-a="nav" data-v="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>More</button>
+</nav>
+<div id="toast"></div>
+<div id="lb" hidden></div>
+<a id="dl" hidden></a>
+<input type="file" id="camIn" accept="image/*" capture="environment">
+<input type="file" id="libIn" accept="image/*" multiple>
+<input type="file" id="impIn" accept=".json,application/json">
+<script>
+'use strict';
+/* ================= helpers ================= */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const num=v=>{const n=parseFloat(String(v==null?'':v).replace(',','.'));return isFinite(n)?n:NaN};
+const has=v=>v!==''&&v!=null;
+const MINUS='−', TIMES='×';
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+function fx(n,d){d=d==null?1:d;if(!isFinite(n))return '?';const s=Math.abs(n).toFixed(d);return (n<0&&+s!==0?MINUS:'')+s}
+function trim(n,d){if(!isFinite(n))return '?';return fx(n,d==null?1:d).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1')}
+function clock(s){s=Math.max(0,Math.ceil(s-1e-6));const m=Math.floor(s/60),r=s%60;return m+':'+String(r).padStart(2,'0')}
+function parseClock(v){v=String(v).trim();if(v.includes(':')){const [m,s]=v.split(':');return (num(m)||0)*60+(num(s)||0)}return num(v)}
+function fT(s){if(!isFinite(s))return '?';return s>=100?fx(s,0)+'s ('+clock(s)+')':fx(s,1)+'s'}
+function fS(st,d){d=d==null?2:d;if(!isFinite(st))return '?';const s=Math.abs(st).toFixed(d);return (+s===0?'':st>0?'+':MINUS)+s}
+function frac12(k,sign){ /* k in twelfths of a stop */
+  if(k===0)return '0';const sg=k>0?(sign===false?'':'+'):MINUS;k=Math.abs(k);const w=Math.floor(k/12),r=k%12;let f='';
+  if(r){const g=gcd(r,12);f=(r/g)+'/'+(12/g)}return sg+[w||'',f].filter(Boolean).join(' ')}
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+function today(){return new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+function fDate(iso){if(!iso)return '';const p=iso.split('-');return p.length<3?iso:(+p[2])+' '+MON[p[1]-1]+' '+p[0]}
+function getPath(o,p){return p.split('.').reduce((a,k)=>a==null?a:a[k],o)}
+function setPath(o,p,v){const ks=p.split('.');const last=ks.pop();const t=ks.reduce((a,k)=>a[k],o);t[last]=v}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+
+/* ================= storage ================= */
+const DB={db:null,mem:{kv:new Map(),prints:new Map(),photos:new Map()},
+  open(){return new Promise(res=>{try{const r=indexedDB.open('dmax_darkroom',1);
+    r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('kv');d.createObjectStore('prints',{keyPath:'id'});const p=d.createObjectStore('photos',{keyPath:'id'});p.createIndex('printId','printId')};
+    r.onsuccess=()=>{this.db=r.result;res(true)};r.onerror=()=>res(false);r.onblocked=()=>res(false)}catch(e){res(false)}})},
+  tx(store,mode,fn){return new Promise((res,rej)=>{try{const t=this.db.transaction(store,mode);const rq=fn(t.objectStore(store));let out;if(rq)rq.onsuccess=()=>{out=rq.result};t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)}catch(e){rej(e)}})},
+  get(s,k){return this.db?this.tx(s,'readonly',o=>o.get(k)):Promise.resolve(this.mem[s].get(k))},
+  put(s,v,k){if(!this.db){this.mem[s].set(k!==undefined?k:v.id,v);return Promise.resolve()}return this.tx(s,'readwrite',o=>k!==undefined?o.put(v,k):o.put(v))},
+  del(s,k){if(!this.db){this.mem[s].delete(k);return Promise.resolve()}return this.tx(s,'readwrite',o=>o.delete(k))},
+  all(s){return this.db?this.tx(s,'readonly',o=>o.getAll()):Promise.resolve([...this.mem[s].values()])},
+  clear(s){if(!this.db){this.mem[s].clear();return Promise.resolve()}return this.tx(s,'readwrite',o=>o.clear())},
+  byPrint(id){return this.db?this.tx('photos','readonly',o=>o.index('printId').getAll(id)):Promise.resolve([...this.mem.photos.values()].filter(p=>p.printId===id))}
+};
+
+/* ================= data ================= */
+const STATUSES=[['test','Test'],['work','Work print'],['final','Final'],['edition','Edition'],['exhibited','Exhibited'],['sold','Sold']];
+const stName=k=>(STATUSES.find(s=>s[0]===k)||['',k||''])[1];
+const KINDS=[['test','Test strip'],['work','Test sheet'],['final','Final sheet']];
+const kindName=k=>(KINDS.find(s=>s[0]===k)||['','Photo'])[1];
+const FORMATS={'35mm':[36,24],'645':[56,41.5],'6x6':[56,56],'6x7':[69.5,56],'6x9':[84,56],'4x5':[120,95]};
+const GR=['00','0','½','1','1½','2','2½','3','3½','4','4½','5'];
+/* Ilford Contrast Control, Kodak filtration group (covers LPL and Saunders heads) */
+const SINGLE=[[199,0],[90,0],[70,0],[50,0],[30,0],[0,0],[0,5],[0,25],[0,50],[0,80],[0,140],[0,199]];
+const DUAL=[[162,0],[90,0],[78,5],[68,10],[49,23],[41,32],[32,42],[23,56],[15,75],[6,102],[0,150],[0,'max']];
+const DUALF=[1,1,1,1,1,1,1,1,1,2,2,2];
+const NOM=['2','2.2','2.5','2.8','3.2','3.5','4','4.5','5','5.6','6.3','7.1','8','9','10','11','13','14','16','18','20','22','25','29','32','36','40','45'];
+const apIdx=v=>{const i=NOM.indexOf(String(v));if(i>=0)return i+6;const n=num(v);return n>0?Math.round(6*Math.log2(n)):NaN};
+const apN=i=>Math.pow(2,i/6);
+const apName=i=>NOM[i-6]||trim(apN(i),1);
+const STOPSTEPS=[[12,'1'],[6,'1/2'],[4,'1/3'],[3,'1/4'],[2,'1/6']];
+const DBSTOPS=[2,3,4,6,8,9,12,16,18,24,30,36];
+const FILMS=['HP5 Plus','FP4 Plus','Delta 100','Delta 400','Delta 3200','Pan F Plus','Tri X 400','TMax 100','TMax 400','Kentmere 400','Acros II'];
+const DEVS=['Ilford Multigrade','Ilford Bromophen','Ilford PQ Universal','Kodak Dektol','Ethol LPD','Moersch Eco 4812'];
+const TONERS=['None','Selenium 1+19','Selenium 1+9','Sepia','Gold','Selenium then sepia'];
+const SIZES={in:[[5,7],[8,10],[9.5,12],[11,14],[12,16],[16,20],[20,24]],cm:[[13,18],[18,24],[24,30],[30,40],[40,50],[50,60]]};
+const DEF=()=>({unit:'in',maxY:170,maxM:170,colUnit:'cm',colOffset:0,filterMode:'dual',safe:false,dim:2,sel:5,
+  lenses:[{id:'l80',name:'80mm',f:80},{id:'l50',name:'50mm',f:50}],
+  papers:['Ilford Multigrade FB Classic Glossy','Ilford Multigrade FB Classic Matt','Ilford Multigrade FB Warmtone','Ilford Multigrade FB Cooltone','Ilford Multigrade RC Deluxe Pearl'],
+  chem:[],autoAdv:true,
+  steps:[{name:'Develop',secs:120},{name:'Stop',secs:30},{name:'Fix',secs:60},{name:'Wash aid',secs:600},{name:'Wash',secs:1800}],
+  timer:{lead:0,tick:true,sound:true,secs:10},
+  calib:{on:true,g:{}},lastBackup:0,
+  calc:{tool:'strip',
+    strip:{base:'10',step:4,n:7,mode:'center'},
+    resize:{fmt:'6x7',negLong:'69.5',negShort:'56',lensF:'80',t:'12',N:'8',src:'size',long1:'10',v1:'',col1:'',long2:'20',fromPrint:''},
+    stops:{t:'10',k:0,a:'10',b:'14'},
+    contrast:{t:'10',from:5,to:7},
+    db:{T:'12',printId:'',rows:[{name:'Sky',type:'burn',k:6},{name:'Face',type:'dodge',k:4}]},
+    ap:{t:'10',n1:'8',n2:'11'},
+    paper:{t:'10',p1:'200',p2:'100'}}
+});
+let S=DEF(), prints=[];
+const R={tab:'log',log:{mode:'list',id:null},q:'',filter:'all',more:'menu'};
+let F=null; /* form draft */
+function mergeDef(d,s){for(const k in s){if(s[k]&&typeof s[k]==='object'&&!Array.isArray(s[k])&&d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k]))mergeDef(d[k],s[k]);else d[k]=s[k]}return d}
+function save(){clearTimeout(save.t);save.t=setTimeout(()=>DB.put('kv',S,'settings').catch(()=>{}),250)}
+const byId=id=>prints.find(p=>p.id===id);
+const uMM=u=>(u||S.unit)==='in'?25.4:10;
+const colMM=()=>({cm:10,mm:1,in:25.4}[S.colUnit]||10);
+
+/* ================= grades ================= */
+function gradeInfo(i,mode){mode=mode||S.filterMode;const base=mode==='single'?SINGLE[i]:DUAL[i];
+  let y=base[0],m=base[1],maxNote=false,f=mode==='dual'?DUALF[i]:null,fsrc=mode==='dual'?'start':'none',src='ilford';
+  if(m==='max'){m=S.maxM;maxNote=true}
+  const c=S.calib.on&&S.calib.g[i];
+  if(c){if(has(c.y)&&isFinite(num(c.y))){y=num(c.y);src='mine'}if(has(c.m)&&isFinite(num(c.m))){m=num(c.m);src='mine';maxNote=false}
+    if(has(c.f)&&num(c.f)>0){f=num(c.f);fsrc='mine'}}
+  let clipY=false,clipM=false;
+  if(y>S.maxY){y=S.maxY;clipY=true}
+  if(m>S.maxM){m=S.maxM;clipM=true}
+  return {y,m,f,fsrc,src,clipY,clipM,maxNote}}
+const fFac=g=>g.f==null?'test':TIMES+trim(g.f,2);
+
+/* ================= math ================= */
+function mFromCol(col,f){const D=(col+(num(S.colOffset)||0))*colMM();if(!(D>=4*f))return NaN;return ((D-2*f)+Math.sqrt((D-2*f)*(D-2*f)-4*f*f))/(2*f)}
+const negToPaper=(M,f)=>f*(M+1)*(M+1)/M;
+function resizeMath(c){const f=num(c.lensF),nl=num(c.negLong),ns=num(c.negShort)||nl,t=num(c.t),u=uMM();
+  let M1=c.src==='size'?num(c.long1)*u/nl:c.src==='v'?num(c.v1)/f-1:mFromCol(num(c.col1),f);
+  const M2=num(c.long2)*u/nl;
+  if(!(t>0&&f>0&&nl>0&&M1>0&&M2>0))return null;
+  const t2=t*Math.pow((M2+1)/(M1+1),2);
+  return {f,nl,ns,t,M1,M2,t2,stops:Math.log2(t2/t),long2:num(c.long2),short2:num(c.long2)*ns/nl,long1:M1*nl/u,v2:f*(M2+1),v1:f*(M1+1),col2:negToPaper(M2,f)/colMM()-(num(S.colOffset)||0)}}
+function stripRows(c){const base=num(c.base),st=+c.step,n=clamp(parseInt(c.n)||0,2,15);if(!(base>0))return [];
+  const start=c.mode==='center'?-Math.floor((n-1)/2):0;let prev=0;const rows=[];
+  for(let i=0;i<n;i++){const k=(start+i)*st,total=base*Math.pow(2,k/12),r=Math.round(total*10)/10;rows.push({i:i+1,k,total,inc:Math.round((r-prev)*10)/10});prev=r}
+  return rows}
+
+/* ================= render core ================= */
+const CRUMB={log:'Print log',tools:'Calculators',timer:'Timers',grades:'Grades',more:'More'};
+function render(top){const v=$('#view');let h='';
+  if(R.tab==='log')h=R.log.mode==='detail'?vDetail():R.log.mode==='form'?vForm():vLogList();
+  else if(R.tab==='tools')h=vTools();
+  else if(R.tab==='timer')h=vTimer();
+  else if(R.tab==='grades')h=vGrades();
+  else h=vMore();
+  v.innerHTML=h;
+  $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===R.tab));
+  $('#crumb').textContent=CRUMB[R.tab];
+  if(R.tab==='tools')TOOLS[S.calc.tool].out();
+  if(R.tab==='timer')paintTimer();
+  if(R.tab==='log'&&R.log.mode==='detail')loadGallery();
+  if(R.tab==='more'&&R.more==='backup')storageInfo();
+  if(top)window.scrollTo(0,0)}
+function go(tab){R.tab=tab;render(true)}
+function applySafe(){document.body.classList.toggle('safe',!!S.safe);document.body.classList.remove('dim1','dim2','dim3');document.body.classList.add('dim'+S.dim);
+  const b=$('#safeBtn');b.textContent=S.safe?'Safelight on':'Safelight';b.setAttribute('aria-pressed',S.safe?'true':'false');
+  const m=$('meta[name=theme-color]');if(m)m.content=S.safe?'#000000':'#0d0c0b'}
+const seg=(act,items,cur,extra)=>`<div class="seg">${items.map(([v,l])=>`<button data-a="${act}" ${extra||''} data-v="${v}" class="${String(cur)===String(v)?'on':''}">${l}</button>`).join('')}</div>`;
+const opt=(v,l,cur)=>`<option value="${esc(v)}"${String(cur)===String(v)?' selected':''}>${esc(l)}</option>`;
+
+/* ================= log: list ================= */
+const searchText=p=>[p.title,p.negRef,p.film,p.paper,p.notes,p.dodgeBurn,p.toner,p.dev,stName(p.status)].join(' ').toLowerCase();
+const stars=n=>n>0?`<span class="stars">${'★'.repeat(n)}</span>`:'';
+const sizeTxt=p=>has(p.sizeA)&&has(p.sizeB)?trim(num(p.sizeA),1)+TIMES+trim(num(p.sizeB),1)+(p.unit==='cm'?' cm':''):'';
+function listHtml(){const q=R.q.toLowerCase().trim(),f=R.filter;
+  const list=prints.filter(p=>(f==='all'||(f==='keep'?p.rating>=4:p.status===f))&&(!q||searchText(p).includes(q)))
+    .sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.updated||0)-(a.updated||0));
+  if(!prints.length)return `<div class="card" style="text-align:center;padding:36px 20px"><h2>Nothing in the log yet</h2><p class="muted" style="margin-top:10px">Mix the chems, kill the lights and go make something wet. Then write it down so future you can print it again.</p></div>`;
+  if(!list.length)return `<p class="muted" style="padding:30px 0;text-align:center">No prints match that. Loosen the filters.</p>`;
+  return list.map(p=>{const bits=[sizeTxt(p),has(p.grade)?'Grade '+GR[p.grade]:'',has(p.baseTime)?trim(num(p.baseTime),1)+'s':''].filter(Boolean).join(' · ');
+    return `<button class="card pc" data-a="openPrint" data-id="${p.id}">${p.cover?`<span class="ph th"><img alt="" src="${p.cover}"></span>`:`<span class="noph">${esc((p.title||'?').trim().charAt(0).toUpperCase()||'?')}</span>`}
+    <span class="pc-b"><span class="pc-t">${esc(p.title||'Untitled')}</span><span class="pc-m">${esc([p.negRef,p.film].filter(Boolean).join(' · ')||'No negative ref')}</span><span class="pc-m">${esc(bits||p.paper||'')}</span>
+    <span class="pc-f"><span class="pill st-${p.status}">${stName(p.status)}</span>${has(p.edNo)?`<span class="pill">${esc(p.edNo)}${has(p.edSize)?'/'+esc(p.edSize):''}</span>`:''}${stars(p.rating|0)}<span class="small muted">${fDate(p.date)}</span></span></span></button>`}).join('')}
+function vLogList(){const chips=[['all','All']].concat(STATUSES,[['keep','Keepers']]);
+  const stale=prints.length>4&&Date.now()-(S.lastBackup||0)>30*864e5;
+  return `<input id="q" type="search" placeholder="Search title, neg, film, paper, notes" value="${esc(R.q)}" autocomplete="off">
+  <div class="scroll" style="margin:12px -14px;padding:0 14px 4px">${chips.map(([k,l])=>`<button class="chip ${R.filter===k?'on':''}" data-a="filter" data-v="${k}">${l}</button>`).join('')}</div>
+  ${stale?`<div class="warn" style="margin:0 0 12px">Heads up: no backup in a while. <button class="btn sm ghost" data-a="more" data-v="backup" style="margin-left:6px">Back up</button></div>`:''}
+  <div id="list">${listHtml()}</div>
+  <button class="btn pri fab" data-a="newPrint">New print</button>`}
+
+/* ================= log: detail ================= */
+const kv=(k,v,txt)=>has(v)?`<div class="kv"><span>${k}</span><b class="${txt?'txt':''}">${esc(v)}</b></div>`:'';
+function vDetail(){const p=byId(R.log.id);if(!p){R.log.mode='list';return vLogList()}
+  const tile=(l,v)=>`<div class="tile"><i>${l}</i><b>${has(v)?esc(v):'·'}</b></div>`;
+  const dev=[p.dev,p.dilution,has(p.devTime)?p.devTime:''].filter(has).join(', ');
+  return `<button class="back" data-a="back">‹ All prints</button>
+  <div class="row" style="align-items:flex-start;margin-top:4px"><div class="grow"><h2>${esc(p.title||'Untitled')}</h2><p class="muted" style="margin-top:4px">${esc([p.negRef,p.film,fDate(p.date)].filter(Boolean).join(' · '))}</p></div></div>
+  <div class="row wrap" style="margin-top:10px"><span class="pill st-${p.status}">${stName(p.status)}</span>${has(p.edNo)?`<span class="pill">Edition ${esc(p.edNo)}${has(p.edSize)?' of '+esc(p.edSize):''}</span>`:''}${stars(p.rating|0)}</div>
+  <div id="gal" class="gal" style="margin-top:14px"></div>
+  <div class="row" style="margin-top:8px"><button class="btn sm grow" data-a="pickPhoto" data-src="cam">Camera</button><button class="btn sm grow" data-a="pickPhoto" data-src="lib">Library</button>
+    <select id="kindSel" class="grow" style="min-height:46px;font-size:15px" aria-label="Photo type">${KINDS.map(([k,l])=>opt(k,l,p.status==='test'?'test':p.status==='work'?'work':'final')).join('')}</select></div>
+  <div class="sec"><div class="eyebrow" style="margin-bottom:8px">The recipe</div>
+  <div class="tiles">${tile('Time',has(p.baseTime)?trim(num(p.baseTime),1)+'s':'')}${tile('Aperture',has(p.aperture)?'f/'+p.aperture:'')}${tile('Grade',has(p.grade)?GR[p.grade]:'')}${tile('Yellow',p.y)}${tile('Magenta',p.m)}${tile('Lens',has(p.lensF)?p.lensF+'mm':'')}</div></div>
+  <div class="card" style="margin-top:12px">
+    ${kv('Paper',p.paper,1)}${kv('Print size',sizeTxt(p)?sizeTxt(p)+(p.unit==='cm'?'':' in'):'')}${kv('Image long edge',has(p.imgLong)?p.imgLong+' '+(p.unit||'in'):'')}${kv('Negative format',p.negFormat)}
+    ${kv('Column reading',p.column)}${kv('Lens to paper',has(p.lensToPaper)?p.lensToPaper+' mm':'')}
+    ${kv('Split grade soft',has(p.splitLow)?p.splitLow+'s':'')}${kv('Split grade hard',has(p.splitHigh)?p.splitHigh+'s':'')}
+    ${kv('Dodge and burn',p.dodgeBurn,1)}${kv('Developer',dev,1)}${kv('Toner',p.toner,1)}${kv('Wash',p.wash,1)}${kv('Notes',p.notes,1)}
+  </div>
+  <div class="sec stack">
+    ${has(p.baseTime)?`<button class="btn pri wide" data-a="timePrint">Send ${trim(num(p.baseTime),1)}s to the timer</button>`:''}
+    <div class="g2"><button class="btn" data-a="scalePrint">Scale to new size</button><button class="btn" data-a="planPrint">Plan dodge and burn</button>
+    <button class="btn" data-a="dupPrint">Duplicate for reprint</button><button class="btn" data-a="editPrint">Edit</button></div>
+    ${has(p.edNo)?`<button class="btn wide" data-a="nextEd">Log next in the edition</button>`:''}
+    <button class="btn danger wide" data-a="delPrint">Delete print</button>
+  </div>`}
+async function loadGallery(){const el=$('#gal');if(!el)return;const id=R.log.id;const ph=(await DB.byPrint(id)).sort((a,b)=>a.created-b.created);
+  if(!$('#gal')||R.log.id!==id)return;
+  $('#gal').innerHTML=ph.length?ph.map(x=>`<button class="gi" data-a="viewPhoto" data-id="${x.id}"><span class="ph"><img alt="" src="${x.thumb}"></span>${kindName(x.kind)}</button>`).join(''):`<p class="muted small">No photos yet. Shoot the test strip before it hits the bin.</p>`}
+
+/* ================= log: form ================= */
+function blank(){const last=[...prints].sort((a,b)=>(b.updated||0)-(a.updated||0))[0]||{};
+  return {id:uid(),title:'',negRef:'',film:last.film||'',date:today(),status:'test',paper:last.paper||S.papers[0]||'',sizeA:'',sizeB:'',imgLong:'',unit:S.unit,negFormat:last.negFormat||'6x7',
+    lensF:last.lensF||(S.lenses[0]?S.lenses[0].f:''),aperture:last.aperture||'',column:'',lensToPaper:'',grade:'',y:'',m:'',baseTime:'',splitLow:'',splitHigh:'',dodgeBurn:'',
+    dev:last.dev||'',dilution:last.dilution||'',devTime:last.devTime||'',toner:'',wash:last.wash||'',edNo:'',edSize:'',rating:0,notes:'',cover:'',created:Date.now()}}
+function openForm(p,isNew,photos){F={p:Object.assign({},p),isNew,photos:photos||[],removed:[]};R.tab='log';R.log.mode='form';render(true)}
+function vForm(){const p=F.p;
+  const fi=(label,key,o)=>{o=o||{};return `<label class="f ${o.cls||''}"><span>${label}</span><input data-f="${key}" value="${esc(p[key])}" ${o.dec?'inputmode="decimal"':''} ${o.type?`type="${o.type}"`:''} ${o.list?`list="${o.list}"`:''} placeholder="${esc(o.ph||'')}" autocomplete="off"></label>`};
+  const ta=(label,key,ph)=>`<label class="f"><span>${label}</span><textarea data-f="${key}" placeholder="${esc(ph||'')}">${esc(p[key])}</textarea></label>`;
+  const dl=(id,arr)=>`<datalist id="${id}">${arr.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`;
+  return `<button class="back" data-a="cancelForm">‹ Cancel</button>
+  <h2>${F.isNew?'New print':'Edit print'}</h2>
+  <div class="sec stack"><div class="eyebrow">The print</div>
+    ${fi('Title','title',{ph:'What do you call it'})}
+    <div class="g2">${fi('Date','date',{type:'date'})}<label class="f"><span>Status</span><select data-f="status">${STATUSES.map(([k,l])=>opt(k,l,p.status)).join('')}</select></label></div>
+    ${fi('Paper','paper',{list:'dlPaper',ph:'Paper and surface'})}
+    <div class="g3">${fi('Width','sizeA',{dec:1})}${fi('Height','sizeB',{dec:1})}<label class="f"><span>Unit</span><select data-f="unit" data-r="1">${opt('in','in',p.unit)}${opt('cm','cm',p.unit)}</select></label></div>
+    <div class="scroll">${SIZES[p.unit==='cm'?'cm':'in'].map(([a,b])=>`<button class="chip" data-a="sizeChip" data-v="${a},${b}">${a}${TIMES}${b}</button>`).join('')}</div>
+    ${fi('Image long edge ('+(p.unit||'in')+')','imgLong',{dec:1,ph:'Optional, the picture itself'})}
+  </div>
+  <div class="sec stack"><div class="eyebrow">The negative</div>
+    <div class="g2">${fi('Negative ref','negRef',{ph:'Roll and frame'})}${fi('Film','film',{list:'dlFilm'})}</div>
+    <label class="f"><span>Negative format</span><select data-f="negFormat">${Object.keys(FORMATS).concat(has(p.negFormat)&&!FORMATS[p.negFormat]?[p.negFormat]:[]).map(k=>opt(k,k,p.negFormat)).join('')}</select></label>
+  </div>
+  <div class="sec stack"><div class="eyebrow">The enlarger</div>
+    <div class="g2">${fi('Lens focal length (mm)','lensF',{dec:1})}${fi('Aperture f/','aperture',{dec:1,list:'dlAp'})}</div>
+    <div class="scroll">${S.lenses.map(l=>`<button class="chip" data-a="formLens" data-v="${esc(l.f)}">${esc(l.name)}</button>`).join('')}</div>
+    <div class="g2">${fi('Column reading ('+S.colUnit+')','column',{dec:1})}${fi('Lens to paper (mm)','lensToPaper',{dec:1})}</div>
+  </div>
+  <div class="sec stack"><div class="eyebrow">Exposure</div>
+    <div class="g2">${fi('Base time (s)','baseTime',{dec:1})}<label class="f"><span>Grade</span><select data-f="grade" data-g="1"><option value="">Not set</option>${GR.map((g,i)=>opt(i,g,p.grade)).join('')}</select></label></div>
+    <div class="g2">${fi('Yellow','y',{dec:1})}${fi('Magenta','m',{dec:1})}</div>
+    <div class="g2">${fi('Split soft time (s)','splitLow',{dec:1,ph:'Grade 00'})}${fi('Split hard time (s)','splitHigh',{dec:1,ph:'Grade 5'})}</div>
+    ${ta('Dodge and burn notes','dodgeBurn','Burn sky +1/2 stop, hold back the face 1/3')}
+  </div>
+  <div class="sec stack"><div class="eyebrow">Process</div>
+    ${fi('Developer','dev',{list:'dlDev'})}
+    <div class="g2">${fi('Dilution','dilution',{ph:'1+9'})}${fi('Dev time','devTime',{ph:'2:00'})}</div>
+    <div class="g2">${fi('Toner','toner',{list:'dlToner'})}${fi('Wash','wash',{ph:'Wash aid, 30 min'})}</div>
+  </div>
+  <div class="sec stack"><div class="eyebrow">Edition and verdict</div>
+    <div class="g2">${fi('Edition number','edNo',{dec:1,ph:'3'})}${fi('Edition size','edSize',{dec:1,ph:'25'})}</div>
+    <div><div class="eyebrow" style="margin-bottom:2px">Rating</div><div class="rate">${[1,2,3,4,5].map(i=>`<button data-a="rate" data-v="${i}" class="${p.rating>=i?'on':''}" aria-label="${i} of 5">★</button>`).join('')}</div></div>
+    ${ta('Notes','notes','What worked, what you would change')}
+  </div>
+  <div class="sec stack"><div class="eyebrow">Photos</div>
+    <div id="fph" class="gal">${formPhotos()}</div>
+    <div class="row"><button class="btn sm grow" data-a="pickPhoto" data-src="cam">Camera</button><button class="btn sm grow" data-a="pickPhoto" data-src="lib">Library</button>
+    <select id="kindSel" class="grow" style="min-height:46px;font-size:15px" aria-label="Photo type">${KINDS.map(([k,l])=>opt(k,l,p.status==='test'?'test':p.status==='work'?'work':'final')).join('')}</select></div>
+  </div>
+  <div class="sec"><button class="btn pri big" data-a="savePrint">Save print</button></div>
+  ${dl('dlPaper',S.papers)}${dl('dlFilm',FILMS)}${dl('dlDev',DEVS)}${dl('dlToner',TONERS)}${dl('dlAp',['2.8','4','5.6','8','11','16','22'])}`}
+const formPhotos=()=>F.photos.length?F.photos.map(x=>`<span class="gi"><span class="ph"><img alt="" src="${x.thumb}"></span><span class="row" style="justify-content:space-between"><span>${kindName(x.kind)}</span><button class="btn sm ghost" style="min-height:38px;padding:0 10px" data-a="rmFormPhoto" data-id="${x.id}">Remove</button></span></span>`).join(''):`<p class="muted small">No photos yet.</p>`;
+function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>res([im,u]);im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('image'))};im.src=u})}
+function scaleImg(im,max,q){const w=im.naturalWidth,h=im.naturalHeight,r=Math.min(1,max/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*r));c.height=Math.max(1,Math.round(h*r));
+  const x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',q)}
+async function filesToPhotos(files,printId,kind){const out=[];for(const f of files){try{const [im,u]=await loadImg(f);out.push({id:uid(),printId,kind,data:scaleImg(im,1600,.82),thumb:scaleImg(im,360,.72),created:Date.now()});URL.revokeObjectURL(u)}catch(e){toast('Could not read that image')}}return out}
+async function onPhotoFiles(inp){const files=[...inp.files];inp.value='';if(!files.length)return;const kind=($('#kindSel')||{}).value||'work';
+  if(R.log.mode==='form'&&F){const ph=await filesToPhotos(files,F.p.id,kind);ph.forEach(x=>{x._new=true;F.photos.push(x)});const el=$('#fph');if(el)el.innerHTML=formPhotos()}
+  else if(R.log.mode==='detail'){const p=byId(R.log.id);if(!p)return;const ph=await filesToPhotos(files,p.id,kind);for(const x of ph)await DB.put('photos',x);if(ph.length){p.cover=ph[ph.length-1].thumb;p.updated=Date.now();await DB.put('prints',p)}loadGallery();toast('Photo saved')}}
+async function savePrint(){const p=F.p;if(!String(p.title).trim()&&!String(p.negRef).trim()){toast('Give it a title or a neg ref first');return}
+  p.updated=Date.now();p.rating=p.rating|0;if(p.grade!=='')p.grade=+p.grade;
+  try{for(const id of F.removed)await DB.del('photos',id);
+    for(const x of F.photos)if(x._new){delete x._new;await DB.put('photos',x)}
+    const rank={final:3,work:2,test:1};const best=[...F.photos].sort((a,b)=>(rank[b.kind]-rank[a.kind])||b.created-a.created)[0];p.cover=best?best.thumb:'';
+    await DB.put('prints',p)}catch(e){toast('Save failed. Storage may be full.');return}
+  const i=prints.findIndex(x=>x.id===p.id);if(i>=0)prints[i]=p;else prints.push(p);
+  if(p.paper&&!S.papers.includes(p.paper)){S.papers.push(p.paper);save()}
+  F=null;R.log={mode:'detail',id:p.id};render(true);toast('Saved. Nice one.')}
+function dupOf(p,over){const d=Object.assign({},p,{id:uid(),date:today(),status:'work',edNo:'',rating:0,cover:'',created:Date.now()},over||{});return d}
+
+/* ================= tools ================= */
+const ci=(label,path,o)=>{o=o||{};return `<label class="f ${o.cls||''}"><span>${label}</span><input inputmode="${o.text?'text':'decimal'}" data-k="${path}" value="${esc(getPath(S.calc,path))}" placeholder="${esc(o.ph||'')}" autocomplete="off"></label>`};
+const cs=(label,path,options,o)=>`<label class="f"><span>${label}</span><select data-k="${path}" ${o&&o.n?'data-n="1"':''}>${options.map(([v,l])=>opt(v,l,getPath(S.calc,path))).join('')}</select></label>`;
+const kseg=(path,items)=>seg('setk',items,getPath(S.calc,path),`data-k="${path}"`);
+const apOpts=()=>NOM.slice(3).map(n=>[n,'f/'+n]);
+const setOut=h=>{const o=$('#out');if(o)o.innerHTML=h};
+const hint=`<p class="muted">Fill in the blanks and the numbers land here.</p>`;
+const timerBtn=(s,label)=>`<button class="btn pri wide" data-a="sendT" data-s="${(Math.round(s*10)/10)}" style="margin-top:12px">${label||'Send '+fx(s,1)+'s to the timer'}</button>`;
+function expoWarn(t){return t>120?`<div class="warn">Heads up: that is over two minutes. Open up a stop or two, paper drifts on long burns and the head gets hot.</div>`:t>60?`<div class="warn">Heads up: over a minute. Consider opening up a stop and run a fresh test strip.</div>`:t<5?`<div class="warn">Heads up: under 5 seconds leaves no room to dodge. Stop down a stop or two.</div>`:''}
+const TOOLS={
+strip:{name:'Test strip',html(){return `<div class="stack"><div class="g2">${ci('Base time (s)','strip.base')}${ci('Patches','strip.n')}</div>
+  <div><div class="eyebrow" style="margin-bottom:6px">Step, in stops</div>${kseg('strip.step',STOPSTEPS)}</div>
+  ${kseg('strip.mode',[['center','Centered on base'],['asc','Ascending from base']])}</div><div id="out"></div>`},
+ out(){const c=S.calc.strip,rows=stripRows(c);if(!rows.length)return setOut(hint);
+  setOut(`<div class="out"><table><tr><th>Patch</th><th>Stops</th><th>Total</th><th>Expose</th></tr>${rows.map(r=>`<tr class="${r.k===0?'hl':''}"><td>${r.i}</td><td>${frac12(r.k)}</td><td>${fx(r.total,1)}s</td><td>${r.i>1?'+':''}${fx(r.inc,1)}s</td></tr>`).join('')}</table>
+  <p class="note">Expose the whole sheet for the first time, then cover one more patch before each following burst. Patch 1 ends up lightest.</p>
+  <button class="btn pri wide" data-a="sendStrip" style="margin-top:12px">Send ${rows.length} exposures to the timer</button></div>`)}},
+resize:{name:'Resize',html(){const c=S.calc.resize,u=S.unit;
+  return `<div class="stack">${c.fromPrint&&byId(c.fromPrint)?`<p class="small muted">Scaling from: ${esc(byId(c.fromPrint).title||'Untitled')}</p>`:''}
+  <div class="g2"><label class="f"><span>Negative format</span><select data-k="resize.fmt" data-fmt="1">${Object.keys(FORMATS).map(k=>opt(k,k,c.fmt)).join('')}${opt('custom','Custom',c.fmt)}</select></label>${ci('Neg image long edge (mm)','resize.negLong')}</div>
+  <div class="g2">${ci('Lens (mm)','resize.lensF')}${cs('Aperture','resize.N',apOpts())}</div>
+  <div class="scroll">${S.lenses.map(l=>`<button class="chip ${String(c.lensF)===String(l.f)?'on':''}" data-a="setk" data-k="resize.lensF" data-v="${esc(l.f)}">${esc(l.name)}</button>`).join('')}</div>
+  ${ci('Time that works now (s)','resize.t')}
+  <div><div class="eyebrow" style="margin-bottom:6px">Current size from</div>${kseg('resize.src',[['size','Print size'],['v','Lens to paper'],['col','Column']])}</div>
+  ${c.src==='size'?ci('Current image long edge ('+u+')','resize.long1'):c.src==='v'?ci('Lens to paper distance (mm)','resize.v1'):ci('Column reading ('+S.colUnit+')','resize.col1')}
+  ${ci('New image long edge ('+u+')','resize.long2')}
+  <div class="scroll">${(u==='in'?[8,10,12,14,16,20,24]:[18,24,30,40,50,60]).map(x=>`<button class="chip ${String(c.long2)===String(x)?'on':''}" data-a="setk" data-k="resize.long2" data-v="${x}">${x} ${u}</button>`).join('')}</div></div><div id="out"></div>`},
+ out(){const c=S.calc.resize,r=resizeMath(c),u=S.unit;
+  if(!r){const f=num(c.lensF);return setOut(c.src==='col'&&has(c.col1)&&f>0&&!(mFromCol(num(c.col1),f)>0)?`<div class="warn">That column reading is too low to focus this lens. Check the column offset in Kit.</div>`:hint)}
+  const i0=apIdx(c.N),p=c.fromPrint&&byId(c.fromPrint);let ap='';
+  for(let i=9;i<=30;i++){const tt=r.t2*Math.pow(2,(i-i0)/3);ap+=`<div class="${i===i0?'cur':i%3===0?'full':''}"><i>f/${apName(i)}</i>${tt>=100?fx(tt,0):fx(tt,1)}s</div>`}
+  const sc=r.t2/r.t;
+  setOut(`<div class="out"><div class="eyebrow">New time at f/${apName(i0)}</div><div class="big" style="margin:6px 0 4px">${fx(r.t2,1)}<span style="font-size:.45em">s</span></div>
+  <p class="mono">${fS(r.stops)} stops <span class="muted">(about ${frac12(Math.round(r.stops*12))})</span></p>${expoWarn(r.t2)}
+  ${r.M2<1?`<div class="warn">Heads up: that is below life size. Most enlargers will not focus that low without a longer lens.</div>`:''}
+  <div style="margin-top:12px">
+  <div class="kv"><span>Magnification</span><b>${fx(r.M1,2)}${TIMES} to ${fx(r.M2,2)}${TIMES}</b></div>
+  ${c.src!=='size'?`<div class="kv"><span>Current image long edge</span><b>${fx(r.long1,1)} ${u}</b></div>`:''}
+  <div class="kv"><span>New image size</span><b>${fx(r.long2,1)} ${TIMES} ${fx(r.short2,1)} ${u}</b></div>
+  <div class="kv"><span>Lens to paper</span><b>${fx(r.v2,0)} mm (${fx(r.v2/25.4,1)} in)</b></div>
+  <div class="kv"><span>Column reading</span><b>${fx(r.col2,1)} ${S.colUnit}</b></div>
+  ${p&&has(p.splitLow)?`<div class="kv"><span>Split soft</span><b>${trim(num(p.splitLow),1)}s to ${fx(num(p.splitLow)*sc,1)}s</b></div>`:''}
+  ${p&&has(p.splitHigh)?`<div class="kv"><span>Split hard</span><b>${trim(num(p.splitHigh),1)}s to ${fx(num(p.splitHigh)*sc,1)}s</b></div>`:''}
+  </div>
+  <p class="note">Column reading assumes your column offset in Kit${(num(S.colOffset)||0)===0?', which is still zero. Calibrate it once and this gets real':''}. Dodge and burn times scale by the same ${TIMES}${fx(sc,2)}.</p>
+  ${timerBtn(r.t2)}${p?`<button class="btn wide" data-a="logReprint" style="margin-top:10px">Log this as a new print</button>`:''}
+  <div class="eyebrow" style="margin:16px 0 8px">Same exposure at other apertures</div><div class="apg">${ap}</div></div>`)}},
+stops:{name:'Stops',html(){const c=S.calc.stops;
+  return `<div class="stack">${ci('Time (s)','stops.t')}
+  <div class="g4">${[-12,-6,-4,-3,-2,2,3,4,6,12].map(k=>`<button class="btn sm" data-a="stepk" data-v="${k}">${frac12(k)}</button>`).join('')}<button class="btn sm ghost span2" data-a="stepk" data-v="0">Reset</button></div></div>
+  <div id="out"></div>
+  <div class="sec"><h3>Compare two times</h3><div class="g2" style="margin-top:10px">${ci('Time A (s)','stops.a')}${ci('Time B (s)','stops.b')}</div><div id="out2"></div></div>`},
+ out(){const c=S.calc.stops,t=num(c.t),a=num(c.a),b=num(c.b);
+  if(t>0){const r=t*Math.pow(2,c.k/12);setOut(`<div class="out"><div class="eyebrow">${trim(t,1)}s ${c.k===0?'with no change':'shifted '+frac12(c.k)+' stop'}</div><div class="big" style="margin:6px 0 4px">${fx(r,1)}<span style="font-size:.45em">s</span></div><p class="mono muted">${c.k>=0?'add':'cut'} ${fx(Math.abs(r-t),1)}s</p>${timerBtn(r)}</div>`)}else setOut(hint);
+  const o=$('#out2');if(o)o.innerHTML=a>0&&b>0?`<div class="out"><div class="big" style="font-size:44px">${fS(Math.log2(b/a))}</div><p style="margin-top:6px">stops from A to B <span class="muted">(about ${frac12(Math.round(Math.log2(b/a)*12))})</span></p></div>`:''}},
+contrast:{name:'Contrast',html(){const go=GR.map((g,i)=>[i,'Grade '+g]);
+  return `<div class="stack">${ci('Time that works now (s)','contrast.t')}<div class="g2">${cs('From','contrast.from',go,{n:1})}${cs('To','contrast.to',go,{n:1})}</div></div><div id="out"></div>`},
+ out(){const c=S.calc.contrast,t=num(c.t),a=gradeInfo(+c.from),b=gradeInfo(+c.to);
+  const filt=`<div class="kv"><span>Dial in for grade ${GR[c.to]}</span><b>${b.y}Y ${b.m}M</b></div><div class="kv"><span>Factors</span><b>${fFac(a)} to ${fFac(b)}</b></div>`;
+  if(!(t>0))return setOut(hint);
+  if(a.f==null||b.f==null)return setOut(`<div class="out"><div class="big">test</div><p style="margin-top:8px">No exposure factor for ${a.f==null?'grade '+GR[c.from]:'grade '+GR[c.to]} with single filter settings. Ilford does not publish them for this head, so run a strip, or add your own factors under Grades.</p><div style="margin-top:10px">${filt}</div></div>`);
+  const r=t*b.f/a.f;
+  setOut(`<div class="out"><div class="eyebrow">New time at grade ${GR[c.to]}</div><div class="big" style="margin:6px 0 4px">${fx(r,1)}<span style="font-size:.45em">s</span></div><p class="mono">${fS(Math.log2(r/t))} stops</p>${expoWarn(r)}<div style="margin-top:10px">${filt}</div>
+  <p class="note">${a.fsrc==='mine'&&b.fsrc==='mine'?'Using your calibrated factors.':'Ilford factors are starting points. Highlights hold, shadows move. Confirm with a strip.'}</p>${timerBtn(r)}</div>`)}},
+db:{name:'Dodge and burn',html(){const c=S.calc.db;
+  return `<div class="stack">${c.printId&&byId(c.printId)?`<p class="small muted">Planning for: ${esc(byId(c.printId).title||'Untitled')}</p>`:''}${ci('Base time (s)','db.T')}
+  ${c.rows.map((r,i)=>`<div class="card stack"><div class="row"><div class="grow">${ci('Area','db.rows.'+i+'.name',{text:1,ph:'Sky, face, corner'})}</div><button class="btn xbtn ghost" style="margin-top:20px" data-a="rmRow" data-v="${i}" aria-label="Remove row">×</button></div>
+    <div class="g2">${kseg('db.rows.'+i+'.type',[['burn','Burn'],['dodge','Dodge']])}<select data-k="db.rows.${i}.k" data-n="1" aria-label="Stops">${DBSTOPS.map(k=>opt(k,frac12(k,false)+' stop',r.k)).join('')}</select></div></div>`).join('')}
+  <button class="btn wide" data-a="addRow">Add an area</button></div><div id="out"></div>`},
+ lines(){const c=S.calc.db,T=num(c.T);return c.rows.map(r=>{const s=r.k/12,sec=r.type==='burn'?T*(Math.pow(2,s)-1):T*(1-Math.pow(2,-s));return {r,sec,txt:(r.type==='burn'?'Burn ':'Dodge ')+(r.name||'area')+' '+(r.type==='burn'?'+':'')+frac12(r.k,false)+' stop: '+(r.type==='burn'?'add ':'hold back ')+fx(sec,1)+'s'}})},
+ text(){const c=S.calc.db;return ['Dodge and burn plan, base '+trim(num(c.T),1)+'s'].concat(this.lines().map(l=>l.txt)).join('\n')},
+ out(){const c=S.calc.db,T=num(c.T);if(!(T>0))return setOut(hint);const L=this.lines();
+  setOut(`<div class="out">${L.length?L.map(l=>`<div class="kv"><span>${l.r.type==='burn'?'Burn':'Dodge'} ${esc(l.r.name||'area')} ${l.r.type==='burn'?'+':''}${frac12(l.r.k,false)}</span><b>${l.r.type==='burn'?'add':'hold'} ${fx(l.sec,1)}s${l.r.type==='burn'?` <button class="btn sm ghost" style="min-height:38px;margin-left:6px" data-a="sendT" data-s="${Math.round(l.sec*10)/10}">Time it</button>`:''}</b></div>`).join(''):'<p class="muted">Add an area to plan.</p>'}
+  <p class="note">Burns are extra exposure after the base. Dodges are seconds to hold back during it.</p>
+  <div class="g2" style="margin-top:12px"><button class="btn pri" data-a="copyPlan">Copy plan</button>${c.printId&&byId(c.printId)?`<button class="btn" data-a="savePlan">Save to print</button>`:`<button class="btn" data-a="sendT" data-s="${T}">Time the base</button>`}</div></div>`)}},
+ap:{name:'Aperture and paper',html(){return `<h3>Aperture change</h3><div class="stack" style="margin-top:10px">${ci('Time (s)','ap.t')}<div class="g2">${cs('From','ap.n1',apOpts())}${cs('To','ap.n2',apOpts())}</div></div><div id="out"></div>
+  <div class="sec"><h3>Paper speed change</h3><div class="stack" style="margin-top:10px">${ci('Time (s)','paper.t')}<div class="g2">${ci('Old paper ISO P','paper.p1')}${ci('New paper ISO P','paper.p2')}</div></div><div id="out2"></div>
+  <p class="note">Multigrade FB Classic runs about ISO P 200 for grades 00 to 3½ and 100 for 4 to 5. Check the box sheet for yours.</p></div>`},
+ out(){const a=S.calc.ap,t=num(a.t),i1=apIdx(a.n1),i2=apIdx(a.n2);
+  if(t>0&&isFinite(i1)&&isFinite(i2)){const r=t*Math.pow(apN(i2)/apN(i1),2);setOut(`<div class="out"><div class="eyebrow">f/${apName(i1)} to f/${apName(i2)}</div><div class="big" style="margin:6px 0 4px">${fx(r,1)}<span style="font-size:.45em">s</span></div><p class="mono">${frac12((i2-i1)*4)} stops of time</p>${expoWarn(r)}${timerBtn(r)}</div>`)}else setOut(hint);
+  const p=S.calc.paper,tp=num(p.t),p1=num(p.p1),p2=num(p.p2),o=$('#out2');
+  if(o)o.innerHTML=tp>0&&p1>0&&p2>0?`<div class="out"><div class="eyebrow">ISO P ${trim(p1,0)} to ${trim(p2,0)}</div><div class="big" style="margin:6px 0 4px">${fx(tp*p1/p2,1)}<span style="font-size:.45em">s</span></div><p class="mono">${fS(Math.log2(p1/p2))} stops</p>${timerBtn(tp*p1/p2)}</div>`:''}}
+};
+function vTools(){const t=S.calc.tool;return `<div class="scroll tabs">${Object.keys(TOOLS).map(k=>`<button class="chip ${k===t?'on':''}" data-a="tool" data-v="${k}">${TOOLS[k].name}</button>`).join('')}</div><div id="tool">${TOOLS[t].html()}</div>`}
+
+/* ================= timers ================= */
+const T={enl:{state:'idle',at:0,last:null,queue:null,qi:0},proc:{idx:0,state:'idle',at:0,remain:0,warned:false},met:{on:false,n:0,iv:null},iv:null};
+let AC=null,WL=null,wlOk=true;
+function audio(){try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}if(AC&&AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function beep(f,d,v,t){if(!S.timer.sound||!AC)return;try{const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+(t||0);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v||.25,s+.006);g.gain.setValueAtTime(v||.25,s+d);g.gain.linearRampToValueAtTime(0,s+d+.03);o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+d+.06)}catch(e){}}
+function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
+async function wake(on){try{if(on){if(!WL&&navigator.wakeLock){WL=await navigator.wakeLock.request('screen');WL.addEventListener('release',()=>{WL=null})}else if(!navigator.wakeLock)wlOk=false}else if(WL){const w=WL;WL=null;await w.release()}}catch(e){WL=null;wlOk=false}}
+const anyRun=()=>T.enl.state!=='idle'||T.proc.state==='run'||T.met.on;
+function startLoop(){if(!T.iv)T.iv=setInterval(loop,50);wake(true)}
+function stopLoopIfIdle(){if(!anyRun()){clearInterval(T.iv);T.iv=null;wake(false)}}
+function enlStart(){const e=T.enl;audio();const secs=num(S.timer.secs);
+  if(e.state!=='idle'){e.state='idle';paintTimer();stopLoopIfIdle();return}
+  if(!(secs>0)){toast('Set a time first');return}
+  const now=Date.now(),lead=+S.timer.lead||0;e.last=null;
+  if(lead>0){e.state='lead';e.at=now+lead*1000}else{e.state='run';e.at=now+secs*1000;beep(1320,.1)}
+  startLoop();paintTimer()}
+function enlDone(){const e=T.enl;e.state='idle';beep(660,.45,.3);buzz([200,80,200]);
+  if(e.queue){e.qi++;if(e.qi<e.queue.length){S.timer.secs=e.queue[e.qi]}else{toast('Strip done. Into the dev.');e.qi=0;S.timer.secs=e.queue[0]}}
+  if(R.tab==='timer'&&R.timerTab!=='proc')render();stopLoopIfIdle()}
+function procStart(){const p=T.proc;audio();if(!S.steps.length)return;
+  if(p.state==='run'){p.remain=Math.max(0,(p.at-Date.now())/1000);p.state='pause'}
+  else{if(p.state==='done'||p.idx>=S.steps.length){p.idx=0;p.state='idle'}
+    if(p.state==='idle'){p.remain=S.steps[p.idx].secs;p.warned=false}
+    p.at=Date.now()+p.remain*1000;p.state='run';beep(1320,.1);startLoop()}
+  paintTimer();stopLoopIfIdle()}
+function procNext(auto){const p=T.proc;if(p.idx<S.steps.length-1){p.idx++;p.warned=false;p.remain=S.steps[p.idx].secs;if(auto&&S.autoAdv){p.at=Date.now()+p.remain*1000;p.state='run'}else p.state='idle'}
+  else{p.state='done';p.remain=0;if(auto){const act=S.chem.filter(c=>c.active);if(act.length){act.forEach(c=>{c.used=(+c.used||0)+1});save();toast('Print done. Counted against '+plural(act.length,'batch').replace('batchs','batches')+'.')}else toast('Print done. Go look at it in the light.')}}
+  if(R.tab==='timer')render();stopLoopIfIdle()}
+function loop(){const now=Date.now(),e=T.enl,p=T.proc;
+  if(e.state==='lead'){const r=(e.at-now)/1000,c=Math.ceil(r);if(c!==e.last&&c>0){e.last=c;beep(440,.07)}if(r<=0){e.state='run';e.at=e.at+num(S.timer.secs)*1000;e.last=null;beep(1320,.1)}}
+  else if(e.state==='run'){const r=(e.at-now)/1000;if(r<=0)enlDone();else if(S.timer.tick){const c=Math.ceil(r);if(e.last===null)e.last=c;else if(c!==e.last){e.last=c;beep(880,.03,.14)}}}
+  if(p.state==='run'){const r=(p.at-now)/1000;if(!p.warned&&r<=10&&S.steps[p.idx].secs>12){p.warned=true;beep(520,.12);beep(520,.12,.25,.25)}
+    if(r<=0){beep(990,.18,.3);beep(990,.18,.3,.3);buzz(300);procNext(true)}}
+  paintTimer()}
+function metToggle(){const m=T.met;audio();m.on=!m.on;clearInterval(m.iv);m.n=0;if(m.on){const start=Date.now();beep(700,.03,.2);m.iv=setInterval(()=>{m.n=Math.round((Date.now()-start)/1000);beep(m.n%10===0?1050:700,.03,.2);const el=$('#metN');if(el)el.textContent=m.n},1000);wake(true)}render();stopLoopIfIdle()}
+function paintTimer(){const e=T.enl,p=T.proc,now=Date.now();
+  const nb=$('#navBadge');let badge='';
+  if(e.state==='run')badge=fx(Math.max(0,(e.at-now)/1000),0);else if(p.state==='run')badge=clock((p.at-now)/1000);
+  nb.hidden=!badge||R.tab==='timer';nb.textContent=badge;
+  if(R.tab!=='timer')return;
+  const eb=$('#eBig');if(eb){eb.textContent=e.state==='run'?fx(Math.max(0,(e.at-now)/1000),1):e.state==='lead'?String(Math.max(1,Math.ceil((e.at-now)/1000))):fx(num(S.timer.secs)||0,1);
+    $('#eState').textContent=e.state==='run'?'Exposing':e.state==='lead'?'Get ready':e.queue?'Exposure '+(e.qi+1)+' of '+e.queue.length+(e.qi>0?', cover one more patch first':', whole sheet'):'Ready';
+    $('#eGo').textContent=e.state==='idle'?'Expose':'Stop'}
+  const pb=$('#pBig');if(pb){const r=p.state==='run'?(p.at-now)/1000:p.state==='pause'?p.remain:p.state==='done'?0:(S.steps[p.idx]||{secs:0}).secs;pb.textContent=clock(r);
+    $('#pState').textContent=p.state==='done'?'All done':(S.steps[p.idx]||{name:''}).name+(p.state==='pause'?', paused':p.state==='run'&&r<=10?', almost':'');
+    $('#pGo').textContent=p.state==='run'?'Pause':p.state==='pause'?'Resume':p.state==='done'?'Start over':'Start'}}
+function vTimer(){const tt=R.timerTab||'enl',e=T.enl,p=T.proc;
+  const head=seg('ttab',[['enl','Enlarger'],['proc','Process']],tt);
+  const wl=`<p class="note" style="text-align:center">${wlOk?'Screen stays awake while a timer runs.':'This browser will not hold the screen awake. Bump your auto lock time.'}</p>`;
+  if(tt==='enl')return `${head}
+  <div class="card" style="margin-top:14px"><div id="eState" class="tstate"></div><div id="eBig" class="tbig"></div>
+    <div class="g4">${[-1,-.1,.1,1].map(d=>`<button class="btn sm" data-a="enlAdj" data-v="${d}">${d>0?'+':MINUS}${Math.abs(d)}</button>`).join('')}</div>
+    <label class="f" style="margin-top:10px"><span>Seconds</span><input id="eSecs" inputmode="decimal" value="${esc(S.timer.secs)}" autocomplete="off"></label>
+    <button id="eGo" class="btn pri big" data-a="enlStart" style="margin-top:12px">Expose</button></div>
+  ${e.queue?`<div class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Test strip sequence</div><button class="btn sm ghost" data-a="clearQ">Clear</button></div>
+    <div class="steps" style="margin-top:8px">${e.queue.map((s,i)=>`<button class="stp ${i===e.qi?'on':i<e.qi?'done':''}" data-a="qJump" data-v="${i}"><span>${i===0?'Whole sheet':'Cover '+plural(i,'patch').replace('patchs','patches')}</span><span class="mono">${fx(s,1)}s</span></button>`).join('')}</div></div>`:''}
+  <div class="card stack"><div><div class="eyebrow" style="margin-bottom:6px">Lead in</div>${seg('setS',[[0,'Off'],[3,'3s'],[5,'5s']],S.timer.lead,'data-p="timer.lead" data-n="1"')}</div>
+    <div class="g3"><button class="btn sm ${S.timer.tick?'pri':''}" data-a="tog" data-p="timer.tick">Tick ${S.timer.tick?'on':'off'}</button><button class="btn sm ${S.timer.sound?'pri':''}" data-a="tog" data-p="timer.sound">Sound ${S.timer.sound?'on':'off'}</button><button class="btn sm ${T.met.on?'pri':''}" data-a="met">Metronome${T.met.on?' <span id="metN" class="mono">0</span>':''}</button></div>
+    <p class="note">This counts and beeps. It cannot switch the enlarger, so hit the lamp or pull the card on the high beep.</p></div>${wl}`;
+  return `${head}
+  <div class="card" style="margin-top:14px"><div id="pState" class="tstate"></div><div id="pBig" class="tbig"></div>
+    <div class="row"><button id="pGo" class="btn pri big grow" data-a="pStart">Start</button></div>
+    <div class="g2" style="margin-top:10px"><button class="btn" data-a="pNext">Next step</button><button class="btn" data-a="pReset">Reset</button></div></div>
+  <div class="card"><div class="steps">${S.steps.map((s,i)=>`<button class="stp ${p.state!=='done'&&i===p.idx?'on':(i<p.idx||p.state==='done')?'done':''}" data-a="pJump" data-v="${i}"><span>${esc(s.name)}</span><span class="mono">${clock(s.secs)}</span></button>`).join('')}</div>
+    <div class="g2" style="margin-top:12px"><button class="btn sm ${S.autoAdv?'pri':''}" data-a="tog" data-p="autoAdv">Auto advance ${S.autoAdv?'on':'off'}</button><button class="btn sm" data-a="more" data-v="kit">Edit steps</button></div>
+    <p class="note">Two beeps at 10 seconds left so you can drain. Double high beep means move the print.</p></div>${wl}`}
+
+/* ================= grades ================= */
+function vGrades(){const i=S.sel,g=gradeInfo(i),flags=[];
+  if(g.clipY)flags.push('Yellow clipped to your dial max of '+S.maxY);
+  if(g.clipM)flags.push('Magenta clipped to your dial max of '+S.maxM+'. Expect a touch less than a true grade '+GR[i]);
+  if(g.maxNote)flags.push('Ilford says use max magenta, so this follows your dial max');
+  const row=(k)=>{const x=gradeInfo(k);return `<tr class="${k===i?'hl':''}" data-a="grade" data-v="${k}"><td>${GR[k]}${x.src==='mine'?' •':''}</td><td>${x.y}${x.clipY?'*':''}</td><td>${x.m}${x.clipM?'*':x.maxNote?' max':''}</td><td>${fFac(x)}</td></tr>`};
+  return `${seg('setS',[['dual','Dual filter'],['single','Single filter']],S.filterMode,'data-p="filterMode"')}
+  <div class="card gread" style="margin-top:14px"><div class="gname">Grade ${GR[i]}</div>
+    <div class="ym"><div><i>YELLOW</i><b>${g.y}</b></div><div><i>MAGENTA</i><b>${g.m}</b></div></div>
+    <p class="mono" style="margin-top:10px;font-size:19px">Exposure factor ${fFac(g)} <span class="muted small" style="font-family:var(--sans)">${g.fsrc==='mine'?'your calibration':g.fsrc==='start'?'starting point':'unknown, run a strip'}</span></p>
+    ${g.src==='mine'?'<p class="small muted" style="margin-top:4px">Filtration from your calibration</p>':''}
+    ${flags.map(f=>`<div class="warn">Heads up: ${f}.</div>`).join('')}</div>
+  <div class="g4" style="margin-top:12px">${GR.map((n,k)=>`<button class="gbtn ${k===i?'on':''}" data-a="grade" data-v="${k}" aria-label="Grade ${n}">${n}</button>`).join('')}</div>
+  <div class="card" style="margin-top:14px"><table><tr><th>Grade</th><th>Y</th><th>M</th><th>Factor</th></tr>${GR.map((_,k)=>row(k)).join('')}</table>
+    <p class="note">Ilford Contrast Control data, Kodak filtration group, which is where LPL and Saunders dichroic heads live. Dual filter keeps exposure steadier between grades. Star means clipped to your dial max, dot means your own numbers. Dial max is set in Kit.</p></div>
+  <div class="sec"><div class="row" style="justify-content:space-between"><h3>Calibration</h3><button class="btn sm ${S.calib.on?'pri':''}" data-a="tog" data-p="calib.on">${S.calib.on?'In use':'Ignored'}</button></div>
+    <p class="note" style="margin:6px 0 12px">Ring your own steps and note what your head and paper really do. Anything you enter here beats Ilford everywhere in the app. Leave a box empty to keep the stock value.</p>
+    <div class="card"><div class="g4" style="align-items:center"><span class="eyebrow">Grade</span><span class="eyebrow">Y</span><span class="eyebrow">M</span><span class="eyebrow">Factor</span>
+    ${GR.map((n,k)=>{const c=S.calib.g[k]||{};const b=gradeInfo(k);return `<b class="mono" style="font-size:20px">${n}</b>${['y','m','f'].map(q=>`<input inputmode="decimal" data-cal="${k}.${q}" value="${esc(c[q])}" placeholder="${q==='f'?(DUALF[k]&&S.filterMode==='dual'?DUALF[k]:'?'):(S.filterMode==='single'?SINGLE[k]:DUAL[k])[q==='y'?0:1]}" aria-label="Grade ${n} ${q==='f'?'factor':q==='y'?'yellow':'magenta'}" style="padding:10px 8px;text-align:center">`).join('')}`}).join('')}</div>
+    <button class="btn danger wide" data-a="calReset" style="margin-top:12px">Clear my calibration</button></div></div>`}
+
+/* ================= more ================= */
+function vMore(){const m=R.more;
+  if(m==='kit')return vKit();if(m==='ed')return vEditions();if(m==='stats')return vStats();if(m==='backup')return vBackup();if(m==='about')return vAbout();
+  return `<div class="menu"><button class="btn" data-a="more" data-v="kit"><span>Kit and settings</span><small>Lenses, column, papers, chems</small></button>
+  <button class="btn" data-a="more" data-v="ed"><span>Editions</span><small>What is printed, what is sold</small></button>
+  <button class="btn" data-a="more" data-v="stats"><span>Stats</span><small>Your darkroom in numbers</small></button>
+  <button class="btn" data-a="more" data-v="backup"><span>Backup</span><small>Export, import, CSV</small></button>
+  <button class="btn" data-a="more" data-v="about"><span>Field notes</span><small>The math and the fine print</small></button></div>
+  ${DB.db?'':'<div class="warn">Heads up: this browser blocked the database, so nothing will survive a reload. Open the file in a regular browser tab.</div>'}`}
+const backMore=`<button class="back" data-a="more" data-v="menu">‹ More</button>`;
+const si=(label,path,o)=>{o=o||{};return `<label class="f"><span>${label}</span><input ${o.type?`type="${o.type}"`:''} inputmode="${o.text?'text':'decimal'}" data-s="${path}" ${o.n?'data-n="1"':''} ${o.clock?'data-clock="1"':''} ${o.r?'data-r="1"':''} value="${esc(o.clock?clock(getPath(S,path)):getPath(S,path))}" placeholder="${esc(o.ph||'')}" autocomplete="off"></label>`};
+function chemState(c){const age=c.mixed?Math.floor((Date.parse(today())-Date.parse(c.mixed))/864e5):null,cap=num(c.capacity),used=+c.used||0,life=num(c.life);
+  const bits=[];if(age!=null)bits.push('Day '+age+(life>0?' of '+life:''));bits.push(used+(cap>0?' of '+cap:'')+' prints');
+  const dead=(life>0&&age>life)||(cap>0&&used>=cap),tired=!dead&&((life>0&&age>=life*.8)||(cap>0&&used>=cap*.8));
+  return {txt:bits.join(' · '),dead,tired}}
+function vKit(){
+  return `${backMore}<h2>Kit and settings</h2>
+  <div class="sec stack"><h3>Units and dials</h3>
+    <div><div class="eyebrow" style="margin-bottom:6px">Print size unit</div>${seg('setS',[['in','Inches'],['cm','Centimetres']],S.unit,'data-p="unit"')}</div>
+    <div class="g2">${si('Max yellow dial','maxY',{n:1})}${si('Max magenta dial','maxM',{n:1})}</div>
+    <div><div class="eyebrow" style="margin-bottom:6px">Safelight brightness</div>${seg('setS',[[1,'Low'],[2,'Mid'],[3,'High']],S.dim,'data-p="dim" data-n="1"')}</div>
+  </div>
+  <div class="sec stack"><h3>Column</h3>
+    <div><div class="eyebrow" style="margin-bottom:6px">Column scale unit</div>${seg('setS',[['cm','cm'],['mm','mm'],['in','in']],S.colUnit,'data-p="colUnit"')}</div>
+    ${si('Column offset ('+S.colUnit+')','colOffset',{n:1})}
+    <p class="note">Offset is what you add to the column reading to get the real distance from negative to paper. Do not measure it, let the app work it out: focus any print, then fill in below.</p>
+    <div class="card stack"><div class="g2"><label class="f"><span>Column reading</span><input id="ccR" inputmode="decimal"></label><label class="f"><span>Image long edge (${S.unit})</span><input id="ccL" inputmode="decimal"></label>
+      <label class="f"><span>Neg long edge (mm)</span><input id="ccN" inputmode="decimal" value="${esc(S.calc.resize.negLong)}"></label><label class="f"><span>Lens (mm)</span><input id="ccF" inputmode="decimal" value="${esc(S.calc.resize.lensF)}"></label></div>
+      <button class="btn wide" data-a="calCol">Work out my offset</button></div>
+  </div>
+  <div class="sec stack"><h3>Lenses</h3>
+    ${S.lenses.map((l,i)=>`<div class="row"><div class="grow">${si('Name','lenses.'+i+'.name',{text:1})}</div><div style="width:96px">${si('mm','lenses.'+i+'.f',{n:1})}</div><button class="btn xbtn ghost" style="margin-top:20px" data-a="rmItem" data-p="lenses" data-v="${i}" aria-label="Remove lens">×</button></div>`).join('')}
+    <button class="btn wide" data-a="addLens">Add a lens</button></div>
+  <div class="sec stack"><h3>Papers</h3>
+    ${S.papers.map((p,i)=>`<div class="row"><div class="grow"><input data-s="papers.${i}" value="${esc(p)}" aria-label="Paper name" autocomplete="off"></div><button class="btn xbtn ghost" data-a="rmItem" data-p="papers" data-v="${i}" aria-label="Remove paper">×</button></div>`).join('')}
+    <button class="btn wide" data-a="addPaper">Add a paper</button></div>
+  <div class="sec stack"><h3>Chemistry</h3>
+    ${S.chem.length?'':'<p class="muted small">Track a batch and the app nags you before it dies.</p>'}
+    ${S.chem.map((c,i)=>{const st=chemState(c);return `<div class="card stack">
+      <div class="row"><div class="grow">${si('Batch','chem.'+i+'.name',{text:1,ph:'Multigrade dev 1+9'})}</div><button class="btn xbtn ghost" style="margin-top:20px" data-a="rmItem" data-p="chem" data-v="${i}" aria-label="Remove batch">×</button></div>
+      ${si('Mixed','chem.'+i+'.mixed',{type:'date',text:1,r:1})}<div class="g2">${si('Capacity','chem.'+i+'.capacity',{n:1,r:1,ph:'prints'})}${si('Good for days','chem.'+i+'.life',{n:1,r:1})}</div>
+      <p class="mono">${st.txt}</p>
+      ${st.dead?'<div class="warn" style="margin-top:0">Past it. Dump this and mix fresh.</div>':st.tired?'<div class="warn" style="margin-top:0">Heads up: getting tired. Watch your blacks.</div>':''}
+      <div class="g3"><button class="btn pri" data-a="chemPlus" data-v="${i}">+1 print</button><button class="btn" data-a="chemMinus" data-v="${i}">${MINUS}1</button><button class="btn ${c.active?'pri':''}" data-a="chemAct" data-v="${i}">${c.active?'In trays':'Shelved'}</button></div>
+      <p class="note" style="margin-top:0">Batches marked in trays get +1 on their own each time the process timer finishes a run.</p></div>`}).join('')}
+    <button class="btn wide" data-a="addChem">Add a batch</button></div>
+  <div class="sec stack"><h3>Process steps</h3>
+    ${S.steps.map((s,i)=>`<div class="row"><div class="grow">${si('Step','steps.'+i+'.name',{text:1})}</div><div style="width:104px">${si('Time','steps.'+i+'.secs',{clock:1,text:1})}</div><button class="btn xbtn ghost" style="margin-top:20px" data-a="rmItem" data-p="steps" data-v="${i}" aria-label="Remove step">×</button></div>`).join('')}
+    <button class="btn wide" data-a="addStep">Add a step</button>
+    <p class="note">Times read as minutes and seconds, so 2:00 or just 120.</p></div>`}
+function edGroups(){const g={};prints.filter(p=>has(p.edNo)).forEach(p=>{const k=(p.title||'Untitled')+'|'+(p.negRef||'');(g[k]=g[k]||[]).push(p)});
+  return Object.values(g).map(a=>{a.sort((x,y)=>num(x.edNo)-num(y.edNo));return {title:a[0].title||'Untitled',neg:a[0].negRef,list:a,size:Math.max(0,...a.map(p=>num(p.edSize)||0))}}).sort((a,b)=>a.title.localeCompare(b.title))}
+function vEditions(){const gs=edGroups();
+  return `${backMore}<h2>Editions</h2><p class="muted" style="margin-top:6px">Every print with an edition number, grouped by title and negative.</p>
+  ${gs.length?gs.map(g=>{const sold=g.list.filter(p=>p.status==='sold').length,shown=g.list.filter(p=>p.status==='exhibited').length,next=Math.max(...g.list.map(p=>num(p.edNo)||0))+1,full=g.size&&next>g.size;
+    return `<div class="card" style="margin-top:14px"><h3>${esc(g.title)}</h3><p class="small muted">${esc(g.neg||'')}</p>
+    <p class="mono" style="margin:10px 0">${g.list.length}${g.size?' of '+g.size:''} printed · ${sold} sold · ${shown} on walls</p>
+    ${g.size?`<div style="border:1px solid var(--line);border-radius:6px"><div class="bar" style="width:${clamp(g.list.length/g.size*100,2,100)}%"></div></div>`:''}
+    <div class="row wrap" style="margin-top:12px">${g.list.map(p=>`<button class="chip" data-a="openPrint" data-id="${p.id}">${esc(p.edNo)} <span class="muted small">${stName(p.status)}</span></button>`).join('')}</div>
+    ${full?'<p class="note">Edition is full. Hands off that negative.</p>':`<button class="btn wide" data-a="nextEd" data-id="${g.list[g.list.length-1].id}" style="margin-top:12px">Log number ${next}</button>`}</div>`}).join(''):`<div class="card" style="margin-top:14px"><p class="muted">No editions yet. Give a print an edition number and size and it shows up here.</p></div>`}`}
+function vStats(){const n=prints.length;if(!n)return `${backMore}<h2>Stats</h2><div class="card" style="margin-top:14px"><p class="muted">Log a few prints and this page wakes up.</p></div>`;
+  const count=(fn)=>{const m={};prints.forEach(p=>{const k=fn(p);if(has(k))m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
+  const bars=(arr,lab)=>{const mx=Math.max(1,...arr.map(a=>a[1]));return arr.map(([k,v])=>`<div class="barrow"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(lab?lab(k):k)}</span><div><div class="bar" style="width:${v/mx*100}%"></div></div><b>${v}</b></div>`).join('')};
+  const keep=prints.filter(p=>['final','edition','exhibited','sold'].includes(p.status)).length,rated=prints.filter(p=>p.rating>0),avg=rated.length?rated.reduce((a,p)=>a+p.rating,0)/rated.length:0;
+  const now=new Date(),ms=[];for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);ms.push([d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),MON[d.getMonth()].charAt(0)])}
+  const mc=ms.map(([k])=>prints.filter(p=>(p.date||'').slice(0,7)===k).length),mm=Math.max(1,...mc);
+  const byStatus=STATUSES.map(([k,l])=>[l,prints.filter(p=>p.status===k).length]).filter(a=>a[1]);
+  const times=prints.map(p=>num(p.baseTime)).filter(x=>x>0).sort((a,b)=>a-b),med=times.length?times[Math.floor(times.length/2)]:0;
+  return `${backMore}<h2>Stats</h2>
+  <div class="tiles" style="margin-top:14px"><div class="tile"><i>Prints</i><b>${n}</b></div><div class="tile"><i>Keepers</i><b>${Math.round(keep/n*100)}%</b></div><div class="tile"><i>Avg stars</i><b>${avg?fx(avg,1):'·'}</b></div>
+  <div class="tile"><i>Sold</i><b>${prints.filter(p=>p.status==='sold').length}</b></div><div class="tile"><i>Negatives</i><b>${count(p=>p.negRef).length}</b></div><div class="tile"><i>Median time</i><b>${med?trim(med,1)+'s':'·'}</b></div></div>
+  <div class="card" style="margin-top:14px"><div class="eyebrow" style="margin-bottom:10px">Last 12 months</div><div class="months">${mc.map(v=>`<div style="height:${v/mm*100}%"></div>`).join('')}</div><div class="mlab">${ms.map(m=>`<span>${m[1]}</span>`).join('')}</div></div>
+  <div class="card"><div class="eyebrow" style="margin-bottom:6px">By status</div>${bars(byStatus)}</div>
+  <div class="card"><div class="eyebrow" style="margin-bottom:6px">By grade</div>${bars(count(p=>has(p.grade)?p.grade:'').sort((a,b)=>a[0]-b[0]),k=>'Grade '+GR[k])||'<p class="muted small">No grades logged.</p>'}</div>
+  <div class="card"><div class="eyebrow" style="margin-bottom:6px">By paper</div>${bars(count(p=>p.paper).slice(0,6))||'<p class="muted small">No papers logged.</p>'}</div>
+  <div class="card"><div class="eyebrow" style="margin-bottom:6px">By film</div>${bars(count(p=>p.film).slice(0,6))||'<p class="muted small">No films logged.</p>'}</div>`}
+function vBackup(){
+  return `${backMore}<h2>Backup</h2><p class="muted" style="margin-top:6px">Everything lives in this browser on this device. Nothing leaves it unless you export. Back up before you clear browser data or switch phones.</p>
+  <div class="sec stack"><button class="btn pri wide" data-a="exportJson">Export everything (JSON)</button><button class="btn wide" data-a="exportCsv">Export prints (CSV)</button>
+    <p class="note">${S.lastBackup?'Last full backup '+fDate(new Date(S.lastBackup-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10))+'.':'No backup yet.'} The JSON holds settings, prints and photos.</p></div>
+  <div class="sec stack"><h3>Import</h3><button class="btn wide" data-a="importPick" data-v="merge">Import and merge</button><button class="btn danger wide" data-a="importPick" data-v="replace">Import and replace everything</button>
+    <p class="note">Merge adds prints from the file and updates any that match. Replace wipes this device first.</p></div>
+  <div class="sec stack"><h3>Storage</h3><p id="stor" class="mono muted">Checking</p><button class="btn wide" data-a="persist">Ask the browser to keep my data</button></div>`}
+async function storageInfo(){let t=plural(prints.length,'print');try{const ph=await DB.all('photos');t+=', '+plural(ph.length,'photo');if(navigator.storage&&navigator.storage.estimate){const e=await navigator.storage.estimate();if(e.usage)t+=', about '+fx(e.usage/1048576,1)+' MB used'}}catch(e){}const el=$('#stor');if(el)el.textContent=t}
+function vAbout(){return `${backMore}<h2>Field notes</h2><div class="card stack" style="margin-top:14px">
+  <p><b>Resize.</b> New time = old time ${TIMES} ((M2 + 1) / (M1 + 1))², where M is magnification. It gets you close. Paper does not respond in a perfectly straight line, so always confirm with a strip.</p>
+  <p><b>Stops.</b> New time = time ${TIMES} 2 to the power of stops. Burn = base ${TIMES} (2^s ${MINUS} 1). Dodge = base ${TIMES} (1 ${MINUS} 2^${MINUS}s).</p>
+  <p><b>Aperture.</b> New time = time ${TIMES} (N2 / N1)². <b>Paper speed.</b> New time = time ${TIMES} old ISO P / new ISO P.</p>
+  <p><b>Grades.</b> Filtration is Ilford Contrast Control data for Multigrade papers, Kodak group. Dual filter factors of ${TIMES}1 up to grade 3½ and ${TIMES}2 from 4 to 5 are starting points only.</p>
+  <p><b>Column.</b> The app treats column reading plus offset as the distance from negative to paper, using thin lens math. Calibrate the offset once in Kit.</p>
+  <p><b>Safelight mode.</b> Red on black and dim, but a phone is still a light source. Keep it away from open paper, face it down when you can, and run a fog test before you trust it.</p>
+  <p><b>Timers.</b> The app counts and beeps but cannot switch your enlarger. Sound needs one tap to wake up, which the start button handles.</p>
+  <p class="muted small">Dmax is a single file. No account, no cloud, no tracking. Add it to your home screen and it behaves like an app.</p></div>`}
+
+/* ================= export / import ================= */
+function download(blob,name){const u=URL.createObjectURL(blob),a=$('#dl');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),5000)}
+async function exportJson(){const photos=await DB.all('photos');S.lastBackup=Date.now();save();
+  download(new Blob([JSON.stringify({app:'dmax',version:1,exported:new Date().toISOString(),settings:S,prints,photos})],{type:'application/json'}),'dmax_backup_'+today().replace(/\D/g,'')+'.json');toast('Backup exported');if(R.more==='backup'&&R.tab==='more')render()}
+const CSVCOLS=['title','negRef','film','date','status','paper','sizeA','sizeB','unit','imgLong','negFormat','lensF','aperture','column','lensToPaper','grade','y','m','baseTime','splitLow','splitHigh','dodgeBurn','dev','dilution','devTime','toner','wash','edNo','edSize','rating','notes','id'];
+function exportCsv(){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const rows=[CSVCOLS.join(',')].concat(prints.map(p=>CSVCOLS.map(c=>q(c==='grade'?(has(p.grade)?GR[p.grade].replace('½',p.grade<1?'1/2':' 1/2'):''):c==='status'?stName(p.status):p[c])).join(',')));
+  download(new Blob(['﻿'+rows.join('\r\n')],{type:'text/csv'}),'dmax_prints_'+today().replace(/\D/g,'')+'.csv');toast('CSV exported')}
+async function importFile(file,mode){let d;try{d=JSON.parse(await file.text())}catch(e){toast('That file is not valid JSON');return}
+  if(!d||d.app!=='dmax'||!Array.isArray(d.prints)){toast('That does not look like a Dmax backup');return}
+  try{if(mode==='replace'){await DB.clear('prints');await DB.clear('photos');prints=[];if(d.settings){S=mergeDef(DEF(),d.settings)}}
+    for(const p of d.prints){if(!p||!p.id)continue;await DB.put('prints',p);const i=prints.findIndex(x=>x.id===p.id);if(i>=0)prints[i]=p;else prints.push(p)}
+    for(const x of (d.photos||[])){if(x&&x.id&&x.printId)await DB.put('photos',x)}
+    await DB.put('kv',S,'settings')}catch(e){toast('Import hit a snag. Storage may be full.');return}
+  applySafe();render();toast('Imported '+plural(d.prints.length,'print'))}
+
+/* ================= actions ================= */
+let armed=null;
+function arm(el,fn){if(armed===el){armed=null;fn();return}if(armed&&armed.isConnected)armed.textContent=armed.dataset.lbl;armed=el;el.dataset.lbl=el.textContent;el.textContent='Sure? Tap again';setTimeout(()=>{if(armed===el){armed=null;if(el.isConnected)el.textContent=el.dataset.lbl}},3500)}
+function copyText(t){const fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()};
+  try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).catch(fb);else fb()}catch(e){fb()}toast('Copied')}
+const A={
+  nav(el){if(el.dataset.v==='more')R.more='menu';if(el.dataset.v==='log'&&R.tab==='log'&&R.log.mode==='detail')R.log.mode='list';go(el.dataset.v)},
+  safe(){S.safe=!S.safe;save();applySafe()},
+  filter(el){R.filter=el.dataset.v;render()},
+  newPrint(){openForm(blank(),true)},
+  openPrint(el){R.tab='log';R.log={mode:'detail',id:el.dataset.id};render(true)},
+  back(){R.log.mode='list';render(true)},
+  async editPrint(){const p=byId(R.log.id);openForm(p,false,await DB.byPrint(p.id))},
+  cancelForm(){const was=F;F=null;R.log.mode=was&&!was.isNew&&byId(was.p.id)?'detail':'list';render(true)},
+  savePrint(){savePrint()},
+  delPrint(el){arm(el,async()=>{const id=R.log.id;for(const x of await DB.byPrint(id))await DB.del('photos',x.id);await DB.del('prints',id);prints=prints.filter(p=>p.id!==id);R.log.mode='list';render(true);toast('Deleted')})},
+  dupPrint(){openForm(dupOf(byId(R.log.id)),true);toast('Copied the recipe. Tweak and save.')},
+  nextEd(el){const src=byId(el.dataset.id||R.log.id);if(!src)return;const sibs=prints.filter(p=>has(p.edNo)&&(p.title||'')===(src.title||'')&&(p.negRef||'')===(src.negRef||''));
+    const next=Math.max(0,...sibs.map(p=>num(p.edNo)||0))+1;openForm(dupOf(src,{edNo:String(next),status:'edition'}),true)},
+  scalePrint(){const p=byId(R.log.id),c=S.calc.resize,conv=v=>num(v)*uMM(p.unit)/uMM();c.fromPrint=p.id;
+    if(FORMATS[p.negFormat]){c.fmt=p.negFormat;c.negLong=String(FORMATS[p.negFormat][0]);c.negShort=String(FORMATS[p.negFormat][1])}
+    if(has(p.lensF))c.lensF=String(p.lensF);if(has(p.baseTime))c.t=String(p.baseTime);if(has(p.aperture)&&isFinite(apIdx(p.aperture)))c.N=apName(apIdx(p.aperture));
+    if(has(p.imgLong)){c.src='size';c.long1=trim(conv(p.imgLong),2)}else if(has(p.lensToPaper)){c.src='v';c.v1=String(p.lensToPaper)}else if(has(p.column)){c.src='col';c.col1=String(p.column)}
+    else if(has(p.sizeA)&&has(p.sizeB)){c.src='size';c.long1=trim(conv(Math.max(num(p.sizeA),num(p.sizeB))),2)}
+    S.calc.tool='resize';save();go('tools')},
+  logReprint(){const c=S.calc.resize,r=resizeMath(c),p=byId(c.fromPrint);if(!r||!p)return;const sc=r.t2/r.t,rd=x=>String(Math.round(x*10)/10);
+    openForm(dupOf(p,{baseTime:rd(r.t2),splitLow:has(p.splitLow)?rd(num(p.splitLow)*sc):'',splitHigh:has(p.splitHigh)?rd(num(p.splitHigh)*sc):'',sizeA:'',sizeB:'',unit:S.unit,imgLong:trim(r.long2,2),lensToPaper:String(Math.round(r.v2)),column:rd(r.col2),status:'test',
+      notes:'Scaled from '+trim(r.long1,1)+' to '+trim(r.long2,1)+' '+S.unit+' ('+fS(r.stops)+' stops). Dodge and burn times '+TIMES+fx(sc,2)+'. Confirm with a strip.'+(p.notes?'\n'+p.notes:'')}),true)},
+  planPrint(){const p=byId(R.log.id),c=S.calc.db;c.printId=p.id;if(has(p.baseTime))c.T=String(p.baseTime);S.calc.tool='db';save();go('tools')},
+  timePrint(){const p=byId(R.log.id);sendTimer(num(p.baseTime))},
+  rate(el){const v=+el.dataset.v;F.p.rating=F.p.rating===v?0:v;$$('.rate button').forEach(b=>b.classList.toggle('on',+b.dataset.v<=F.p.rating))},
+  sizeChip(el){const [a,b]=el.dataset.v.split(',');F.p.sizeA=a;F.p.sizeB=b;$('[data-f=sizeA]').value=a;$('[data-f=sizeB]').value=b},
+  formLens(el){F.p.lensF=el.dataset.v;$('[data-f=lensF]').value=el.dataset.v},
+  pickPhoto(el){$(el.dataset.src==='cam'?'#camIn':'#libIn').click()},
+  rmFormPhoto(el){const id=el.dataset.id,x=F.photos.find(p=>p.id===id);if(x&&!x._new)F.removed.push(id);F.photos=F.photos.filter(p=>p.id!==id);$('#fph').innerHTML=formPhotos()},
+  async viewPhoto(el){const x=await DB.get('photos',el.dataset.id);if(!x)return;const lb=$('#lb');lb.innerHTML=`<span class="ph"><img alt="" src="${x.data}"></span><p class="eyebrow">${kindName(x.kind)} · ${fDate(new Date(x.created-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10))}</p><div class="row"><button class="btn" data-a="closeLb">Close</button><button class="btn danger" data-a="delPhoto" data-id="${x.id}">Delete photo</button></div>`;lb.hidden=false},
+  closeLb(){$('#lb').hidden=true;$('#lb').innerHTML=''},
+  delPhoto(el){arm(el,async()=>{await DB.del('photos',el.dataset.id);const p=byId(R.log.id);if(p){const rest=await DB.byPrint(p.id);p.cover=rest.length?rest[rest.length-1].thumb:'';await DB.put('prints',p)}A.closeLb();loadGallery()})},
+  tool(el){S.calc.tool=el.dataset.v;save();render(true)},
+  setk(el){const v=el.dataset.v;setPath(S.calc,el.dataset.k,/^(strip\.step)$/.test(el.dataset.k)?+v:v);save();render()},
+  stepk(el){const k=+el.dataset.v,c=S.calc.stops;c.k=k===0?0:clamp(c.k+k,-72,72);save();TOOLS.stops.out()},
+  sendStrip(){const rows=stripRows(S.calc.strip);if(!rows.length)return;T.enl.queue=rows.map(r=>r.inc);T.enl.qi=0;T.enl.state='idle';S.timer.secs=rows[0].inc;save();R.timerTab='enl';go('timer');toast('Strip loaded. Tap Expose for each burst.')},
+  sendT(el){sendTimer(num(el.dataset.s))},
+  addRow(){S.calc.db.rows.push({name:'',type:'burn',k:4});save();render()},
+  rmRow(el){S.calc.db.rows.splice(+el.dataset.v,1);save();render()},
+  copyPlan(){copyText(TOOLS.db.text())},
+  async savePlan(){const p=byId(S.calc.db.printId);if(!p)return;p.dodgeBurn=(p.dodgeBurn?p.dodgeBurn+'\n':'')+TOOLS.db.lines().map(l=>l.txt).join('\n');p.updated=Date.now();await DB.put('prints',p);toast('Plan saved to the print')},
+  grade(el){S.sel=+el.dataset.v;save();render()},
+  tog(el){setPath(S,el.dataset.p,!getPath(S,el.dataset.p));save();render();if(R.tab==='timer')audio()},
+  setS(el){setPath(S,el.dataset.p,el.dataset.n?+el.dataset.v:el.dataset.v);save();applySafe();render()},
+  calReset(el){arm(el,()=>{S.calib.g={};save();render();toast('Back to stock Ilford numbers')})},
+  more(el){R.tab='more';R.more=el.dataset.v;render(true)},
+  addLens(){S.lenses.push({id:uid(),name:'',f:''});save();render()},
+  addPaper(){S.papers.push('');save();render()},
+  addChem(){S.chem.push({id:uid(),name:'',mixed:today(),capacity:'',used:0,life:'',active:true});save();render()},
+  addStep(){S.steps.push({name:'New step',secs:60});save();render()},
+  rmItem(el){getPath(S,el.dataset.p).splice(+el.dataset.v,1);if(el.dataset.p==='steps'){T.proc.idx=0;T.proc.state='idle'}save();render()},
+  chemPlus(el){const c=S.chem[+el.dataset.v];c.used=(+c.used||0)+1;save();render()},
+  chemMinus(el){const c=S.chem[+el.dataset.v];c.used=Math.max(0,(+c.used||0)-1);save();render()},
+  chemAct(el){const c=S.chem[+el.dataset.v];c.active=!c.active;save();render()},
+  calCol(){const rd=num($('#ccR').value),L=num($('#ccL').value)*uMM(),n=num($('#ccN').value),f=num($('#ccF').value);if(!(isFinite(rd)&&L>0&&n>0&&f>0)){toast('Fill in all four boxes');return}
+    const M=L/n;S.colOffset=Math.round((negToPaper(M,f)/colMM()-rd)*10)/10;save();render();toast('Offset set to '+fx(S.colOffset,1)+' '+S.colUnit)},
+  exportJson(){exportJson()},exportCsv(){exportCsv()},
+  importPick(el){const m=el.dataset.v;if(m==='replace')arm(el,()=>{R.imp=m;$('#impIn').click()});else{R.imp=m;$('#impIn').click()}},
+  async persist(){let ok=false;try{ok=navigator.storage&&navigator.storage.persist?await navigator.storage.persist():false}catch(e){}toast(ok?'Done. The browser will hang on to it.':'The browser said not right now. Keep exporting backups.')},
+  ttab(el){R.timerTab=el.dataset.v;render()},
+  enlStart(){enlStart()},
+  enlAdj(el){if(T.enl.state!=='idle')return;S.timer.secs=Math.max(.1,Math.round(((num(S.timer.secs)||0)+ +el.dataset.v)*10)/10);save();const i=$('#eSecs');if(i)i.value=S.timer.secs;paintTimer()},
+  clearQ(){T.enl.queue=null;T.enl.qi=0;render()},
+  qJump(el){if(T.enl.state!=='idle')return;T.enl.qi=+el.dataset.v;S.timer.secs=T.enl.queue[T.enl.qi];render()},
+  met(){metToggle()},
+  pStart(){procStart()},
+  pNext(){procNext(false)},
+  pReset(){T.proc.idx=0;T.proc.state='idle';render();stopLoopIfIdle()},
+  pJump(el){T.proc.idx=+el.dataset.v;T.proc.state='idle';render();stopLoopIfIdle()}
+};
+function sendTimer(s){if(!(s>0))return;T.enl.queue=null;T.enl.qi=0;if(T.enl.state!=='idle')T.enl.state='idle';S.timer.secs=Math.round(s*10)/10;save();R.timerTab='enl';go('timer');toast(fx(S.timer.secs,1)+'s loaded')}
+
+/* ================= events ================= */
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;const fn=A[el.dataset.a];if(fn){e.preventDefault();fn(el,e)}});
+/* rerender after a field commit, delayed so a tap that caused the blur still lands */
+function later(){const tab=R.tab,more=R.more,mode=R.log.mode;clearTimeout(later.t);later.t=setTimeout(()=>{if(R.tab===tab&&R.more===more&&R.log.mode===mode)render()},260)}
+function onField(e,isChange){const el=e.target;
+  if(el.id==='q'){R.q=el.value;$('#list').innerHTML=listHtml();return}
+  if(el.id==='eSecs'){const v=num(el.value);if(v>0&&T.enl.state==='idle'){S.timer.secs=v;save();paintTimer()}return}
+  if(el.dataset.f&&F){F.p[el.dataset.f]=el.value;
+    if(el.dataset.g&&el.value!==''&&isChange){const g=gradeInfo(+el.value);F.p.y=String(g.y);F.p.m=String(g.m);$('[data-f=y]').value=g.y;$('[data-f=m]').value=g.m}
+    if(el.dataset.r&&isChange)later();return}
+  if(el.dataset.k){const k=el.dataset.k;setPath(S.calc,k,el.dataset.n?+el.value:el.value);
+    if(el.dataset.fmt){const f=FORMATS[el.value];if(f){S.calc.resize.negLong=String(f[0]);S.calc.resize.negShort=String(f[1])}save();render();return}
+    if(k==='resize.negLong'){const f=FORMATS[S.calc.resize.fmt];if(!f||num(el.value)!==f[0]){S.calc.resize.negShort=f?String(num(el.value)*f[1]/f[0]):el.value}}
+    save();TOOLS[S.calc.tool].out();return}
+  if(el.dataset.cal){const [k,q]=el.dataset.cal.split('.');const g=S.calib.g[k]=S.calib.g[k]||{y:'',m:'',f:''};g[q]=el.value.trim();if(!has(g.y)&&!has(g.m)&&!has(g.f))delete S.calib.g[k];save();if(isChange)later();return}
+  if(el.dataset.s){let v=el.value;if(el.dataset.clock){v=parseClock(v);if(!(v>0))return}else if(el.dataset.n){v=v===''?'':num(v);if(v!==''&&!isFinite(v))return}
+    setPath(S,el.dataset.s,v);save();if(isChange&&(el.dataset.r||el.dataset.clock))later();return}}
+document.addEventListener('input',e=>onField(e,false));
+document.addEventListener('change',e=>{const el=e.target;
+  if(el.id==='camIn'||el.id==='libIn'){onPhotoFiles(el);return}
+  if(el.id==='impIn'){const f=el.files[0];el.value='';if(f)importFile(f,R.imp||'merge');return}
+  if(el.tagName!=='SELECT'&&!(el.dataset.r||el.dataset.clock||el.dataset.cal))return;
+  onField(e,true)});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&R.tab==='timer'&&!/INPUT|TEXTAREA|SELECT|BUTTON/.test(e.target.tagName)){e.preventDefault();(R.timerTab==='proc'?procStart:enlStart)()}
+  if(e.key==='Escape'&&!$('#lb').hidden)A.closeLb()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&anyRun())wake(true)});
+
+/* ================= pwa bits ================= */
+function pwa(){try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});if(location.protocol==='https:')return;const c=document.createElement('canvas');c.width=c.height=192;const x=c.getContext('2d');x.fillStyle='#0d0c0b';x.fillRect(0,0,192,192);x.strokeStyle='#f0a030';x.lineWidth=7;x.beginPath();x.arc(96,96,62,0,7);x.stroke();
+  x.fillStyle='#f0a030';x.font='italic 600 84px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText('D',96,100);const png=c.toDataURL('image/png');
+  const add=(rel,href,type)=>{const l=document.createElement('link');l.rel=rel;l.href=href;if(type)l.type=type;document.head.appendChild(l)};
+  add('apple-touch-icon',png);add('icon',png,'image/png');
+  add('manifest','data:application/manifest+json,'+encodeURIComponent(JSON.stringify({name:'Dmax darkroom notebook',short_name:'Dmax',display:'standalone',background_color:'#0d0c0b',theme_color:'#0d0c0b',icons:[{src:png,sizes:'192x192',type:'image/png'}]})))}catch(e){}}
+
+/* ================= boot ================= */
+(async function(){const ok=await DB.open();
+  try{const s=await DB.get('kv','settings');if(s)S=mergeDef(DEF(),s);prints=(await DB.all('prints'))||[]}catch(e){}
+  applySafe();pwa();render();
+  if(!ok)toast('Database blocked here. Data will not persist.');
+  window.__dmax={S:()=>S,prints:()=>prints,resizeMath,stripRows,gradeInfo,T};
+})();
+</script>
+</body>
+</html>
